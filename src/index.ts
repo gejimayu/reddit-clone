@@ -1,13 +1,33 @@
-import 'reflect-metadata';
+// TypeORM
+import 'reflect-metadata'; // required to import beforehand by typeORM
 import { createConnection } from 'typeorm';
-import { Post } from './entities/Post';
-import ORM_CONFIG from './config/type-orm.config';
 
-createConnection(ORM_CONFIG)
-  .then((connection) => {
-    console.log('successfully connceted to database');
-    const post = new Post();
-    post.title = 'my first post';
-    return connection.manager.save(post).then((post) => console.log(`Post ${post.id} has been saved`));
-  })
-  .catch((error) => console.log(error));
+// Apollo / GrahpQL
+import { ApolloServer } from 'apollo-server-express';
+import { typeDefs, resolvers } from './schema/post';
+
+// Express
+import express from 'express';
+
+const main = async () => {
+  // DB setup
+  const orm = await createConnection();
+  console.log('Successfully connceted to database');
+
+  // Server setup
+  const apolloServer = new ApolloServer({ typeDefs, resolvers, context: () => ({ ormManager: orm.manager }) });
+  const app = express();
+  apolloServer.applyMiddleware({ app });
+
+  // Endpoints
+  app.get('/', (_, res) => {
+    res.send('hello');
+  });
+
+  // Start server
+  app.listen(4000, () => {
+    console.log('Server started on localhost:4000');
+  });
+};
+
+main().catch((error) => console.log(error));

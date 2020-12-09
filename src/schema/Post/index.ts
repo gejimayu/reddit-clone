@@ -18,11 +18,11 @@ export const typeDefs = gql`
     updatedAt: String
   }
 
-  type Query {
+  extend type Query {
     posts: [Post]
   }
 
-  type Mutation {
+  extend type Mutation {
     createPost(title: String!): Post
     updatePost(id: ID!, title: String!): Post
     deletePost(id: ID!): Boolean

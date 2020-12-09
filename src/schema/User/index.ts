@@ -10,6 +10,7 @@ import bcrypt from 'bcrypt';
 
 // Types
 import { MutationAddUserArgs, MutationLoginArgs, MutationAddUserReturn } from './types';
+import { GraphQLContext } from '../../types/context';
 import { IResolvers } from 'apollo-server-express';
 
 export const typeDefs = gql`
@@ -40,7 +41,7 @@ export const resolvers: IResolvers = {
       newUser.password = await bcrypt.hash(password, 10);
       return userRepository.save(newUser);
     },
-    async login(_, { username, password }: MutationLoginArgs): MutationAddUserReturn {
+    async login(_, { username, password }: MutationLoginArgs, context: GraphQLContext): MutationAddUserReturn {
       const userRepository = getRepository(User);
       const theUser = await userRepository.findOne({ where: { username } });
       if (!theUser) {
@@ -55,6 +56,8 @@ export const resolvers: IResolvers = {
           error: { message: 'Password is not correct.' },
         };
       }
+
+      context.req.session.userId = theUser.id;
 
       return { user: theUser };
     },

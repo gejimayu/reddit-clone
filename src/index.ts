@@ -11,18 +11,44 @@ import { typeDefs as userTypeDefs, resolvers as userResolvers } from './schema/U
 // Express
 import express from 'express';
 
+// Redis
+import redis from 'redis';
+import session from 'express-session';
+import connectRedis from 'connect-redis';
+
+// Types
+import { GraphQLContext } from './types/context';
+
 const main = async () => {
+  const app = express();
+
   // DB setup
   const orm = await createConnection();
   console.log('Successfully connceted to database');
 
-  // Server setup
+  // Redis/session setup
+  const RedisStore = connectRedis(session);
+  app.use(
+    session({
+      name: 'qid',
+      store: new RedisStore({ client: redis.createClient(), disableTouch: true }),
+      cookie: {
+        maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: false, // TODO: turn on later
+      },
+      secret: 'dummy-secret',
+      resave: false,
+    }),
+  );
+
+  // Apollo Server setup
   const apolloServer = new ApolloServer({
     typeDefs: [baseTypeDefs, userTypeDefs, postTypeDefs],
     resolvers: [userResolvers, postResolvers],
-    context: () => ({ ormManager: orm.manager }),
+    context: ({ req, res }): GraphQLContext => ({ ormManager: orm.manager, req, res }),
   });
-  const app = express();
   apolloServer.applyMiddleware({ app });
 
   // Endpoints

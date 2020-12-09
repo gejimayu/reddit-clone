@@ -8,7 +8,7 @@ import { Post } from '../../entities/post';
 import { getRepository } from 'typeorm';
 
 // Types
-import { MutationCreatePostArgs } from './types';
+import { MutationCreatePostArgs, MutationUpdatePostArgs, MutationDeletePostArgs } from './types';
 
 export const typeDefs = gql`
   type Post {
@@ -24,6 +24,8 @@ export const typeDefs = gql`
 
   type Mutation {
     createPost(title: String!): Post
+    updatePost(id: ID!, title: String!): Post
+    deletePost(id: ID!): Boolean
   }
 `;
 
@@ -35,11 +37,25 @@ export const resolvers: IResolvers = {
     },
   },
   Mutation: {
-    async createPost(_, args: MutationCreatePostArgs) {
+    async createPost(_, { title }: MutationCreatePostArgs) {
       const postRepository = getRepository(Post);
       const newPost = new Post();
-      newPost.title = args.title;
+      newPost.title = title;
       return postRepository.save(newPost);
+    },
+    async updatePost(_, { id, title }: MutationUpdatePostArgs) {
+      const postRepository = getRepository(Post);
+      const currentPost = await postRepository.findOne(id);
+      if (currentPost) {
+        currentPost.title = title;
+        await postRepository.save(currentPost);
+      }
+      return currentPost;
+    },
+    async deletePost(_, { id }: MutationDeletePostArgs) {
+      const postRepository = getRepository(Post);
+      await postRepository.delete(id);
+      return true;
     },
   },
 };

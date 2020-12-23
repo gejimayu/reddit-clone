@@ -5,6 +5,7 @@ export const baseTypeDefs = gql`
   type Mutation
 
   type Error {
+    fieldName: String
     message: String!
   }
 `;

@@ -39,7 +39,7 @@ export const resolvers: IResolvers = {
       const theUser = await userRepository.findOne({ where: { username } });
       if (theUser) {
         return {
-          error: { message: 'Username already exists' },
+          error: { fieldName: 'username', message: 'Username already exists' },
         };
       }
       let newUser = new User();
@@ -56,14 +56,14 @@ export const resolvers: IResolvers = {
       const theUser = await userRepository.findOne({ where: { username } });
       if (!theUser) {
         return {
-          error: { message: 'User does not exist' },
+          error: { fieldName: 'username', message: 'User does not exist' },
         };
       }
 
       const isPasswordValid = await bcrypt.compare(password, theUser.password);
       if (!isPasswordValid) {
         return {
-          error: { message: 'Password is not correct.' },
+          error: { fieldName: 'password', message: 'Password is not correct.' },
         };
       }
 

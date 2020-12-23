@@ -19,6 +19,9 @@ import connectRedis from 'connect-redis';
 // Middlewares
 import cors from 'cors';
 
+// Constants
+import { COOKIE_NAME_LOGIN_SESSION } from './constants/cookies';
+
 // Types
 import { GraphQLContext } from './types/context';
 
@@ -41,7 +44,7 @@ const main = async () => {
   const RedisStore = connectRedis(session);
   app.use(
     session({
-      name: 'qid',
+      name: COOKIE_NAME_LOGIN_SESSION,
       store: new RedisStore({ client: redis.createClient(), disableTouch: true }),
       cookie: {
         maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years

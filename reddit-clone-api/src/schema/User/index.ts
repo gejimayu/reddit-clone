@@ -8,6 +8,9 @@ import { User } from '../../entities/User';
 import { getRepository } from 'typeorm';
 import bcrypt from 'bcrypt';
 
+// Constants
+import { COOKIE_NAME_LOGIN_SESSION } from '../../constants/cookies';
+
 // Types
 import {
   MutationAddUserArgs,
@@ -39,6 +42,7 @@ export const typeDefs = gql`
   extend type Mutation {
     addUser(username: String!, password: String!): Response
     login(username: String!, password: String!): Response
+    logout: Boolean
   }
 `;
 
@@ -89,6 +93,19 @@ export const resolvers: IResolvers = {
       context.req.session.userId = theUser.id;
 
       return { user: theUser };
+    },
+    async logout(_, __, { req, res }: GraphQLContext): Promise<boolean> {
+      return new Promise((resolve) => {
+        req.session.destroy((err) => {
+          if (err) {
+            console.log(err);
+            return resolve(false);
+          }
+
+          res.clearCookie(COOKIE_NAME_LOGIN_SESSION);
+          return resolve(true);
+        });
+      });
     },
   },
 };

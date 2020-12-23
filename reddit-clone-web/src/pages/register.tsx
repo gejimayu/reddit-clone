@@ -1,3 +1,6 @@
+// Hooks
+import { useAddUserMutation } from '../generated/graphql';
+
 // Components
 import Container from '../components/Container';
 import InputField from '../components/InputField';
@@ -5,11 +8,15 @@ import { Formik, Form } from 'formik';
 import { Button } from '@chakra-ui/react';
 
 const Register: React.FC = () => {
+  const [register, {}] = useAddUserMutation();
+
   return (
     <Container>
       <Formik
         initialValues={{ username: '', password: '' }}
-        onSubmit={(values) => console.log(values)}
+        onSubmit={async (values) => {
+          const repsonse = await register({ variables: values });
+        }}
       >
         {({ isSubmitting }) => (
           <Form>

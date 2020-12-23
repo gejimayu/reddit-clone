@@ -14,3 +14,7 @@ export type MutationAddUserReturn = Promise<{
   error?: Error;
   user?: User;
 }>;
+export type MutationLoginReturn = Promise<{
+  error?: Error;
+  user?: User;
+}>;

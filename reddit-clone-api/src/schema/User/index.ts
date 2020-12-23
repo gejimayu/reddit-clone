@@ -9,7 +9,7 @@ import { getRepository } from 'typeorm';
 import bcrypt from 'bcrypt';
 
 // Types
-import { MutationAddUserArgs, MutationLoginArgs, MutationAddUserReturn } from './types';
+import { MutationAddUserArgs, MutationLoginArgs, MutationLoginReturn, MutationAddUserReturn } from './types';
 import { GraphQLContext } from '../../types/context';
 import { IResolvers } from 'apollo-server-express';
 
@@ -27,21 +27,31 @@ export const typeDefs = gql`
   }
 
   extend type Mutation {
-    addUser(username: String!, password: String!): User
+    addUser(username: String!, password: String!): Response
     login(username: String!, password: String!): Response
   }
 `;
 
 export const resolvers: IResolvers = {
   Mutation: {
-    async addUser(_, { username, password }: MutationAddUserArgs) {
+    async addUser(_, { username, password }: MutationAddUserArgs, context: GraphQLContext): MutationAddUserReturn {
       const userRepository = getRepository(User);
-      const newUser = new User();
+      const theUser = await userRepository.findOne({ where: { username } });
+      if (theUser) {
+        return {
+          error: { message: 'Username already exists' },
+        };
+      }
+      let newUser = new User();
       newUser.username = username;
       newUser.password = await bcrypt.hash(password, 10);
-      return userRepository.save(newUser);
+      newUser = await userRepository.save(newUser);
+
+      context.req.session.userId = newUser.id;
+
+      return { user: newUser };
     },
-    async login(_, { username, password }: MutationLoginArgs, context: GraphQLContext): MutationAddUserReturn {
+    async login(_, { username, password }: MutationLoginArgs, context: GraphQLContext): MutationLoginReturn {
       const userRepository = getRepository(User);
       const theUser = await userRepository.findOne({ where: { username } });
       if (!theUser) {

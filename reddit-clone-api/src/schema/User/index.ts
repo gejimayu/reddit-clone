@@ -9,7 +9,13 @@ import { getRepository } from 'typeorm';
 import bcrypt from 'bcrypt';
 
 // Types
-import { MutationAddUserArgs, MutationLoginArgs, MutationLoginReturn, MutationAddUserReturn } from './types';
+import {
+  MutationAddUserArgs,
+  MutationLoginArgs,
+  MutationLoginReturn,
+  MutationAddUserReturn,
+  QueryMeReturn,
+} from './types';
 import { GraphQLContext } from '../../types/context';
 import { IResolvers } from 'apollo-server-express';
 
@@ -26,6 +32,10 @@ export const typeDefs = gql`
     error: Error
   }
 
+  extend type Query {
+    me: User
+  }
+
   extend type Mutation {
     addUser(username: String!, password: String!): Response
     login(username: String!, password: String!): Response
@@ -33,6 +43,15 @@ export const typeDefs = gql`
 `;
 
 export const resolvers: IResolvers = {
+  Query: {
+    async me(_, __, { req }: GraphQLContext): QueryMeReturn {
+      if (!req.session.userId) {
+        return null;
+      }
+      const userRepository = getRepository(User);
+      return userRepository.findOne({ id: req.session.userId });
+    },
+  },
   Mutation: {
     async addUser(_, { username, password }: MutationAddUserArgs, context: GraphQLContext): MutationAddUserReturn {
       const userRepository = getRepository(User);

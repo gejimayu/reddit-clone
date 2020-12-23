@@ -10,6 +10,7 @@ export interface MutationLoginArgs {
   password: string;
 }
 
+export type QueryMeReturn = Promise<User | null | undefined>;
 export type MutationAddUserReturn = Promise<{
   error?: Error;
   user?: User;

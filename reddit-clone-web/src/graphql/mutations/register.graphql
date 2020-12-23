@@ -5,8 +5,7 @@ mutation AddUser($username: String!, $password: String!) {
       message
     }
     user {
-      id
-      username
+      ...UserBasicInfo
     }
   }
 }

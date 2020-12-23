@@ -1,5 +1,6 @@
 // Hooks
 import { useAddUserMutation } from '../generated/graphql';
+import { useRouter } from 'next/router';
 
 // Components
 import Container from '../components/Container';
@@ -9,13 +10,19 @@ import { Button } from '@chakra-ui/react';
 
 const Register: React.FC = () => {
   const [register, {}] = useAddUserMutation();
+  const router = useRouter();
 
   return (
     <Container>
       <Formik
         initialValues={{ username: '', password: '' }}
-        onSubmit={async (values) => {
-          const repsonse = await register({ variables: values });
+        onSubmit={async (values, { setErrors }) => {
+          const response = await register({ variables: values });
+          if (response.data?.addUser?.error) {
+            setErrors({ username: response.data.addUser.error.message });
+          } else {
+            router.push('/');
+          }
         }}
       >
         {({ isSubmitting }) => (

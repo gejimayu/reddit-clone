@@ -1,6 +1,7 @@
 mutation AddUser($username: String!, $password: String!) {
   addUser(username: $username, password: $password) {
     error {
+      fieldName
       message
     }
     user {

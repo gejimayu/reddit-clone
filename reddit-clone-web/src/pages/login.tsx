@@ -1,5 +1,5 @@
 // Hooks
-import { useAddUserMutation } from '../generated/graphql';
+import { useLoginMutation } from '../generated/graphql';
 import { useRouter } from 'next/router';
 
 // Components
@@ -8,8 +8,8 @@ import InputField from '../components/InputField';
 import { Formik, Form } from 'formik';
 import { Button } from '@chakra-ui/react';
 
-const Register: React.FC = () => {
-  const [register, {}] = useAddUserMutation();
+const Login: React.FC = () => {
+  const [login] = useLoginMutation();
   const router = useRouter();
 
   return (
@@ -17,11 +17,13 @@ const Register: React.FC = () => {
       <Formik
         initialValues={{ username: '', password: '' }}
         onSubmit={async (values, { setErrors }) => {
-          const response = await register({ variables: values });
-          const error = response.data?.addUser?.error;
+          const response = await login({ variables: values });
+          const error = response.data?.login?.error;
           if (error) {
             if (error.fieldName === 'username') {
               setErrors({ username: error.message });
+            } else if (error.fieldName === 'password') {
+              setErrors({ password: error.message });
             }
           } else {
             router.push('/');
@@ -44,7 +46,7 @@ const Register: React.FC = () => {
               marginBottom="20px"
             />
             <Button type="submit" isLoading={isSubmitting}>
-              Register
+              Login
             </Button>
           </Form>
         )}
@@ -53,4 +55,4 @@ const Register: React.FC = () => {
   );
 };
 
-export default Register;
+export default Login;

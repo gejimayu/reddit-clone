@@ -16,6 +16,9 @@ import redis from 'redis';
 import session from 'express-session';
 import connectRedis from 'connect-redis';
 
+// Middlewares
+import cors from 'cors';
+
 // Types
 import { GraphQLContext } from './types/context';
 
@@ -25,6 +28,14 @@ const main = async () => {
   // DB setup
   const orm = await createConnection();
   console.log('Successfully connceted to database');
+
+  // Middlewares
+  app.use(
+    cors({
+      origin: 'http://localhost:3000',
+      credentials: true,
+    }),
+  );
 
   // Redis/session setup
   const RedisStore = connectRedis(session);
@@ -49,7 +60,10 @@ const main = async () => {
     resolvers: [userResolvers, postResolvers],
     context: ({ req, res }): GraphQLContext => ({ ormManager: orm.manager, req, res }),
   });
-  apolloServer.applyMiddleware({ app });
+  apolloServer.applyMiddleware({
+    app,
+    cors: false,
+  });
 
   // Endpoints
   app.get('/', (_, res) => {

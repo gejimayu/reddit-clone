@@ -8,6 +8,7 @@ import NextLink from 'next/link';
 const Navbar: React.FC = () => {
   const { data } = useMeQuery({
     ssr: false,
+    fetchPolicy: 'cache-and-network',
   });
   const [logout, { client, loading: isLogoutLoading }] = useLogoutMutation();
 

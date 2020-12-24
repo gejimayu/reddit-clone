@@ -3,10 +3,11 @@ import { User } from '../../entities/User';
 
 export interface MutationAddUserArgs {
   username: string;
+  email: string;
   password: string;
 }
 export interface MutationLoginArgs {
-  username: string;
+  usernameOrEmail: string;
   password: string;
 }
 

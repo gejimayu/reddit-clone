@@ -7,6 +7,7 @@ import { User } from '../../entities/User';
 // Utils
 import { getRepository } from 'typeorm';
 import bcrypt from 'bcrypt';
+import { validateEmail } from '../../utils/validator';
 
 // Constants
 import { COOKIE_NAME_LOGIN_SESSION } from '../../constants/cookies';
@@ -26,6 +27,7 @@ export const typeDefs = gql`
   type User {
     id: ID!
     username: String!
+    email: String!
     createdAt: String!
     updatedAt: String
   }
@@ -40,8 +42,8 @@ export const typeDefs = gql`
   }
 
   extend type Mutation {
-    addUser(username: String!, password: String!): Response
-    login(username: String!, password: String!): Response
+    addUser(username: String!, email: String!, password: String!): Response
+    login(usernameOrEmail: String!, password: String!): Response
     logout: Boolean
   }
 `;
@@ -56,17 +58,29 @@ export const resolvers: IResolvers = {
       return userRepository.findOne({ id: req.session.userId });
     },
   },
+
   Mutation: {
-    async addUser(_, { username, password }: MutationAddUserArgs, context: GraphQLContext): MutationAddUserReturn {
+    async addUser(
+      _,
+      { username, email, password }: MutationAddUserArgs,
+      context: GraphQLContext,
+    ): MutationAddUserReturn {
       const userRepository = getRepository(User);
-      const theUser = await userRepository.findOne({ where: { username } });
+      let theUser = await userRepository.findOne({ where: { username } });
       if (theUser) {
         return {
           error: { fieldName: 'username', message: 'Username already exists' },
         };
       }
+      theUser = await userRepository.findOne({ where: { email } });
+      if (theUser) {
+        return {
+          error: { fieldName: 'email', message: 'Email already exists' },
+        };
+      }
       let newUser = new User();
       newUser.username = username;
+      newUser.email = email;
       newUser.password = await bcrypt.hash(password, 10);
       newUser = await userRepository.save(newUser);
 
@@ -74,12 +88,16 @@ export const resolvers: IResolvers = {
 
       return { user: newUser };
     },
-    async login(_, { username, password }: MutationLoginArgs, context: GraphQLContext): MutationLoginReturn {
+
+    async login(_, { usernameOrEmail, password }: MutationLoginArgs, context: GraphQLContext): MutationLoginReturn {
       const userRepository = getRepository(User);
-      const theUser = await userRepository.findOne({ where: { username } });
+
+      const theUser = await userRepository.findOne({
+        where: validateEmail(usernameOrEmail) ? { email: usernameOrEmail } : { username: usernameOrEmail },
+      });
       if (!theUser) {
         return {
-          error: { fieldName: 'username', message: 'User does not exist' },
+          error: { fieldName: 'usernameOrEmail', message: 'Username/Email does not exist' },
         };
       }
 
@@ -94,6 +112,7 @@ export const resolvers: IResolvers = {
 
       return { user: theUser };
     },
+
     async logout(_, __, { req, res }: GraphQLContext): Promise<boolean> {
       return new Promise((resolve) => {
         req.session.destroy((err) => {

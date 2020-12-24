@@ -12,7 +12,7 @@ import { typeDefs as userTypeDefs, resolvers as userResolvers } from './schema/U
 import express from 'express';
 
 // Redis
-import redis from 'redis';
+import Redis from 'ioredis';
 import session from 'express-session';
 import connectRedis from 'connect-redis';
 
@@ -30,7 +30,7 @@ const main = async () => {
 
   // DB setup
   const orm = await createConnection();
-  console.log('Successfully connceted to database');
+  console.log('Successfully connected to database');
 
   // Middlewares
   app.use(
@@ -42,10 +42,11 @@ const main = async () => {
 
   // Redis/session setup
   const RedisStore = connectRedis(session);
+  const redis = new Redis();
   app.use(
     session({
       name: COOKIE_NAME_LOGIN_SESSION,
-      store: new RedisStore({ client: redis.createClient(), disableTouch: true }),
+      store: new RedisStore({ client: redis, disableTouch: true }),
       cookie: {
         maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
         httpOnly: true,
@@ -61,7 +62,7 @@ const main = async () => {
   const apolloServer = new ApolloServer({
     typeDefs: [baseTypeDefs, userTypeDefs, postTypeDefs],
     resolvers: [userResolvers, postResolvers],
-    context: ({ req, res }): GraphQLContext => ({ ormManager: orm.manager, req, res }),
+    context: ({ req, res }): GraphQLContext => ({ ormManager: orm.manager, req, res, redis }),
   });
   apolloServer.applyMiddleware({
     app,

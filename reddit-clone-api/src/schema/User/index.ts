@@ -8,9 +8,12 @@ import { User } from '../../entities/User';
 import { getRepository } from 'typeorm';
 import bcrypt from 'bcrypt';
 import { validateEmail } from '../../utils/validator';
+import sendEmail from '../../utils/sendEmail';
+import { v4 } from 'uuid';
 
 // Constants
 import { COOKIE_NAME_LOGIN_SESSION } from '../../constants/cookies';
+import { FORGET_PASSWORD_PREFIX } from '../../constants/redisKey';
 
 // Types
 import {
@@ -18,6 +21,7 @@ import {
   MutationLoginArgs,
   MutationLoginReturn,
   MutationAddUserReturn,
+  MutationForgetPassword,
   QueryMeReturn,
 } from './types';
 import { GraphQLContext } from '../../types/context';
@@ -45,6 +49,7 @@ export const typeDefs = gql`
     addUser(username: String!, email: String!, password: String!): Response
     login(usernameOrEmail: String!, password: String!): Response
     logout: Boolean
+    forgetPassword(email: String!): Boolean
   }
 `;
 
@@ -125,6 +130,24 @@ export const resolvers: IResolvers = {
           return resolve(true);
         });
       });
+    },
+
+    async forgetPassword(_, { email }: MutationForgetPassword, { redis }: GraphQLContext): Promise<boolean> {
+      const userRepository = getRepository(User);
+      const theUser = await userRepository.findOne({ where: { email } });
+      if (!theUser) {
+        return true;
+      }
+
+      const token = v4();
+      await redis.set(FORGET_PASSWORD_PREFIX + token, theUser.id, 'ex', 1000 * 60 * 60 * 24 * 3); // 3 days
+
+      await sendEmail({
+        to: email,
+        html: `<a href="http://localhost:3000/change-password/${token}">reset password</a>`,
+      });
+
+      return true;
     },
   },
 };

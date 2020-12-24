@@ -37,11 +37,12 @@ export type Mutation = {
 
 export type MutationAddUserArgs = {
   username: Scalars['String'];
+  email: Scalars['String'];
   password: Scalars['String'];
 };
 
 export type MutationLoginArgs = {
-  username: Scalars['String'];
+  usernameOrEmail: Scalars['String'];
   password: Scalars['String'];
 };
 
@@ -68,6 +69,7 @@ export type User = {
   __typename?: 'User';
   id: Scalars['ID'];
   username: Scalars['String'];
+  email: Scalars['String'];
   createdAt: Scalars['String'];
   updatedAt?: Maybe<Scalars['String']>;
 };
@@ -93,11 +95,11 @@ export enum CacheControlScope {
 
 export type UserBasicInfoFragment = { __typename?: 'User' } & Pick<
   User,
-  'id' | 'username'
+  'id' | 'username' | 'email'
 >;
 
 export type LoginMutationVariables = Exact<{
-  username: Scalars['String'];
+  usernameOrEmail: Scalars['String'];
   password: Scalars['String'];
 }>;
 
@@ -121,6 +123,7 @@ export type LogoutMutation = { __typename?: 'Mutation' } & Pick<
 
 export type AddUserMutationVariables = Exact<{
   username: Scalars['String'];
+  email: Scalars['String'];
   password: Scalars['String'];
 }>;
 
@@ -153,11 +156,12 @@ export const UserBasicInfoFragmentDoc = gql`
   fragment UserBasicInfo on User {
     id
     username
+    email
   }
 `;
 export const LoginDocument = gql`
-  mutation Login($username: String!, $password: String!) {
-    login(username: $username, password: $password) {
+  mutation Login($usernameOrEmail: String!, $password: String!) {
+    login(usernameOrEmail: $usernameOrEmail, password: $password) {
       error {
         fieldName
         message
@@ -187,7 +191,7 @@ export type LoginMutationFn = Apollo.MutationFunction<
  * @example
  * const [loginMutation, { data, loading, error }] = useLoginMutation({
  *   variables: {
- *      username: // value for 'username'
+ *      usernameOrEmail: // value for 'usernameOrEmail'
  *      password: // value for 'password'
  *   },
  * });
@@ -253,8 +257,8 @@ export type LogoutMutationOptions = Apollo.BaseMutationOptions<
   LogoutMutationVariables
 >;
 export const AddUserDocument = gql`
-  mutation AddUser($username: String!, $password: String!) {
-    addUser(username: $username, password: $password) {
+  mutation AddUser($username: String!, $email: String!, $password: String!) {
+    addUser(username: $username, email: $email, password: $password) {
       error {
         fieldName
         message
@@ -285,6 +289,7 @@ export type AddUserMutationFn = Apollo.MutationFunction<
  * const [addUserMutation, { data, loading, error }] = useAddUserMutation({
  *   variables: {
  *      username: // value for 'username'
+ *      email: // value for 'email'
  *      password: // value for 'password'
  *   },
  * });

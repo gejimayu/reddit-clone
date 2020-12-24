@@ -18,13 +18,15 @@ const Register: React.FC = () => {
   return (
     <Container>
       <Formik
-        initialValues={{ username: '', password: '' }}
+        initialValues={{ username: '', email: '', password: '' }}
         onSubmit={async (values, { setErrors }) => {
           const response = await register({ variables: values });
           const error = response.data?.addUser?.error;
           if (error) {
             if (error.fieldName === 'username') {
               setErrors({ username: error.message });
+            } else if (error.fieldName === 'email') {
+              setErrors({ email: error.message });
             }
           } else {
             router.push('/');
@@ -38,6 +40,13 @@ const Register: React.FC = () => {
               label="Username"
               placeholder="Username"
               marginBottom="10px"
+            />
+            <InputField
+              name="email"
+              label="Email"
+              placeholder="Email"
+              marginBottom="10px"
+              type="email"
             />
             <InputField
               name="password"

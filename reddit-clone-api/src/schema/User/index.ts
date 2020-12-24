@@ -21,7 +21,9 @@ import {
   MutationLoginArgs,
   MutationLoginReturn,
   MutationAddUserReturn,
-  MutationForgetPassword,
+  MutationForgetPasswordArgs,
+  MutationChangePasswordArgs,
+  MutationChangePasswordReturn,
   QueryMeReturn,
 } from './types';
 import { GraphQLContext } from '../../types/context';
@@ -50,6 +52,7 @@ export const typeDefs = gql`
     login(usernameOrEmail: String!, password: String!): Response
     logout: Boolean
     forgetPassword(email: String!): Boolean
+    changePassword(password: String!, token: String!): Response
   }
 `;
 
@@ -132,7 +135,7 @@ export const resolvers: IResolvers = {
       });
     },
 
-    async forgetPassword(_, { email }: MutationForgetPassword, { redis }: GraphQLContext): Promise<boolean> {
+    async forgetPassword(_, { email }: MutationForgetPasswordArgs, { redis }: GraphQLContext): Promise<boolean> {
       const userRepository = getRepository(User);
       const theUser = await userRepository.findOne({ where: { email } });
       if (!theUser) {
@@ -148,6 +151,34 @@ export const resolvers: IResolvers = {
       });
 
       return true;
+    },
+
+    async changePassword(
+      _,
+      { password, token }: MutationChangePasswordArgs,
+      { req, redis }: GraphQLContext,
+    ): MutationChangePasswordReturn {
+      const userId = await redis.get(FORGET_PASSWORD_PREFIX + token);
+      if (!userId) {
+        return {
+          error: { fieldName: 'token', message: 'Token is expired' },
+        };
+      }
+      const userRepository = getRepository(User);
+      const theUser = await userRepository.findOne({ where: { id: userId } });
+      if (!theUser) {
+        return {
+          error: { fieldName: 'token', message: 'User does not exist' },
+        };
+      }
+      theUser.password = await bcrypt.hash(password, 10);
+      await userRepository.save(theUser);
+
+      req.session.userId = theUser.id;
+
+      await redis.del(FORGET_PASSWORD_PREFIX + token);
+
+      return { user: theUser };
     },
   },
 };

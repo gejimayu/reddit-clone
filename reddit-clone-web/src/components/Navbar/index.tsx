@@ -6,7 +6,9 @@ import { Box, Flex, Link, Button } from '@chakra-ui/react';
 import NextLink from 'next/link';
 
 const Navbar: React.FC = () => {
-  const { data } = useMeQuery();
+  const { data } = useMeQuery({
+    ssr: false,
+  });
   const [logout, { client, loading: isLogoutLoading }] = useLogoutMutation();
 
   return (

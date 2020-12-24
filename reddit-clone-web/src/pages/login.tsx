@@ -2,6 +2,9 @@
 import { useLoginMutation } from '../generated/graphql';
 import { useRouter } from 'next/router';
 
+// HOC
+import withApollo from '../hocs/withApollo';
+
 // Components
 import Container from '../components/Container';
 import InputField from '../components/InputField';
@@ -55,4 +58,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login;
+export default withApollo()(Login);

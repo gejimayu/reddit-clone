@@ -2,6 +2,9 @@
 import { useAddUserMutation } from '../generated/graphql';
 import { useRouter } from 'next/router';
 
+// HOC
+import withApollo from '../hocs/withApollo';
+
 // Components
 import Container from '../components/Container';
 import InputField from '../components/InputField';
@@ -53,4 +56,4 @@ const Register: React.FC = () => {
   );
 };
 
-export default Register;
+export default withApollo()(Register);

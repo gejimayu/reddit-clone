@@ -32,7 +32,7 @@ export type Mutation = {
   logout?: Maybe<Scalars['Boolean']>;
   forgetPassword?: Maybe<Scalars['Boolean']>;
   changePassword?: Maybe<Response>;
-  createPost?: Maybe<Post>;
+  createPost?: Maybe<PostResponse>;
   updatePost?: Maybe<Post>;
   deletePost?: Maybe<Scalars['Boolean']>;
 };
@@ -59,11 +59,13 @@ export type MutationChangePasswordArgs = {
 
 export type MutationCreatePostArgs = {
   title: Scalars['String'];
+  text: Scalars['String'];
 };
 
 export type MutationUpdatePostArgs = {
   id: Scalars['ID'];
   title: Scalars['String'];
+  text: Scalars['String'];
 };
 
 export type MutationDeletePostArgs = {
@@ -95,8 +97,17 @@ export type Post = {
   __typename?: 'Post';
   id: Scalars['ID'];
   title: Scalars['String'];
+  text: Scalars['String'];
+  creatorId: Scalars['ID'];
+  points: Scalars['Int'];
   createdAt: Scalars['String'];
   updatedAt?: Maybe<Scalars['String']>;
+};
+
+export type PostResponse = {
+  __typename?: 'PostResponse';
+  post?: Maybe<Post>;
+  error?: Maybe<Error>;
 };
 
 export enum CacheControlScope {
@@ -121,6 +132,31 @@ export type ChangePasswordMutation = { __typename?: 'Mutation' } & {
         { __typename?: 'Error' } & Pick<Error, 'fieldName' | 'message'>
       >;
       user?: Maybe<{ __typename?: 'User' } & UserBasicInfoFragment>;
+    }
+  >;
+};
+
+export type CreatePostMutationVariables = Exact<{
+  title: Scalars['String'];
+  text: Scalars['String'];
+}>;
+
+export type CreatePostMutation = { __typename?: 'Mutation' } & {
+  createPost?: Maybe<
+    { __typename?: 'PostResponse' } & {
+      error?: Maybe<{ __typename?: 'Error' } & Pick<Error, 'message'>>;
+      post?: Maybe<
+        { __typename?: 'Post' } & Pick<
+          Post,
+          | 'id'
+          | 'title'
+          | 'text'
+          | 'creatorId'
+          | 'points'
+          | 'createdAt'
+          | 'updatedAt'
+        >
+      >;
     }
   >;
 };
@@ -250,6 +286,66 @@ export type ChangePasswordMutationResult = Apollo.MutationResult<ChangePasswordM
 export type ChangePasswordMutationOptions = Apollo.BaseMutationOptions<
   ChangePasswordMutation,
   ChangePasswordMutationVariables
+>;
+export const CreatePostDocument = gql`
+  mutation CreatePost($title: String!, $text: String!) {
+    createPost(title: $title, text: $text) {
+      error {
+        message
+      }
+      post {
+        id
+        title
+        text
+        creatorId
+        points
+        createdAt
+        updatedAt
+      }
+    }
+  }
+`;
+export type CreatePostMutationFn = Apollo.MutationFunction<
+  CreatePostMutation,
+  CreatePostMutationVariables
+>;
+
+/**
+ * __useCreatePostMutation__
+ *
+ * To run a mutation, you first call `useCreatePostMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreatePostMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createPostMutation, { data, loading, error }] = useCreatePostMutation({
+ *   variables: {
+ *      title: // value for 'title'
+ *      text: // value for 'text'
+ *   },
+ * });
+ */
+export function useCreatePostMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CreatePostMutation,
+    CreatePostMutationVariables
+  >
+) {
+  return Apollo.useMutation<CreatePostMutation, CreatePostMutationVariables>(
+    CreatePostDocument,
+    baseOptions
+  );
+}
+export type CreatePostMutationHookResult = ReturnType<
+  typeof useCreatePostMutation
+>;
+export type CreatePostMutationResult = Apollo.MutationResult<CreatePostMutation>;
+export type CreatePostMutationOptions = Apollo.BaseMutationOptions<
+  CreatePostMutation,
+  CreatePostMutationVariables
 >;
 export const ForgetPasswordDocument = gql`
   mutation ForgetPassword($email: String!) {

@@ -6,6 +6,8 @@ import withApollo from '../hocs/withApollo';
 
 // Components
 import Navbar from '../components/Navbar';
+import { Link } from '@chakra-ui/react';
+import NextLink from 'next/link';
 
 const Index: React.FC = () => {
   const { data, loading } = usePostsQuery();
@@ -13,7 +15,9 @@ const Index: React.FC = () => {
   return (
     <>
       <Navbar />
-      <p>Home Page</p>
+      <NextLink href="/create-post">
+        <Link>Create Post</Link>
+      </NextLink>
       {loading ? (
         <p>Loading ...</p>
       ) : data?.posts ? (

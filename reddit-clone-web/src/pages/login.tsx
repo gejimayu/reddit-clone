@@ -30,7 +30,11 @@ const Login: React.FC = () => {
               setErrors({ password: error.message });
             }
           } else {
-            router.push('/');
+            if (router.query.next) {
+              router.push(router.query.next as string);
+            } else {
+              router.push('/');
+            }
           }
         }}
       >

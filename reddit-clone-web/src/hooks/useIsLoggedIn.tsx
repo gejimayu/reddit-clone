@@ -10,7 +10,7 @@ function useIsLoggedIn() {
 
   React.useEffect(() => {
     if (!loading && !data?.me) {
-      router.replace('/login');
+      router.replace('/login?next=' + router.pathname);
     }
   }, [loading, data]);
 }

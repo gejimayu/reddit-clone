@@ -9,7 +9,8 @@ import withApollo from '../hocs/withApollo';
 import Container from '../components/Container';
 import InputField from '../components/InputField';
 import { Formik, Form } from 'formik';
-import { Button } from '@chakra-ui/react';
+import { Button, Link, Flex } from '@chakra-ui/react';
+import NextLink from 'next/link';
 
 const Login: React.FC = () => {
   const [login] = useLoginMutation();
@@ -46,8 +47,13 @@ const Login: React.FC = () => {
               label="Password"
               type="password"
               placeholder="Password"
-              marginBottom="20px"
+              marginBottom="10px"
             />
+            <Flex marginBottom="10px">
+              <NextLink href="/forget-password">
+                <Link marginLeft="auto">Forget Password?</Link>
+              </NextLink>
+            </Flex>
             <Button type="submit" isLoading={isSubmitting}>
               Login
             </Button>

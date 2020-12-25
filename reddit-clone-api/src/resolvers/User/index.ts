@@ -2,7 +2,7 @@
 import { gql } from 'apollo-server-express';
 
 // Entities
-import { User } from '../../entities/User';
+import { User } from '../../entities/user';
 
 // Utils
 import bcrypt from 'bcrypt';
@@ -37,7 +37,7 @@ export const typeDefs = gql`
     updatedAt: String
   }
 
-  type Response {
+  type UserResponse {
     user: User
     error: Error
   }
@@ -47,11 +47,11 @@ export const typeDefs = gql`
   }
 
   extend type Mutation {
-    addUser(username: String!, email: String!, password: String!): Response
-    login(usernameOrEmail: String!, password: String!): Response
+    addUser(username: String!, email: String!, password: String!): UserResponse
+    login(usernameOrEmail: String!, password: String!): UserResponse
     logout: Boolean
     forgetPassword(email: String!): Boolean
-    changePassword(password: String!, token: String!): Response
+    changePassword(password: String!, token: String!): UserResponse
   }
 `;
 

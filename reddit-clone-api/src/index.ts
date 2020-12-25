@@ -4,9 +4,9 @@ import { createConnection } from 'typeorm';
 
 // Apollo / GrahpQL
 import { ApolloServer } from 'apollo-server-express';
-import { baseTypeDefs } from './schema/baseTypeDefs';
-import { typeDefs as postTypeDefs, resolvers as postResolvers } from './schema/Post';
-import { typeDefs as userTypeDefs, resolvers as userResolvers } from './schema/User';
+import { baseTypeDefs } from './resolvers/baseTypeDefs';
+import { typeDefs as postTypeDefs, resolvers as postResolvers } from './resolvers/Post';
+import { typeDefs as userTypeDefs, resolvers as userResolvers } from './resolvers/User';
 
 // Express
 import express from 'express';

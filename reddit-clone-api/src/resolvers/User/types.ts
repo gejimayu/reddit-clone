@@ -1,5 +1,5 @@
 import { Error } from '../baseTypes';
-import { User } from '../../entities/User';
+import { User } from '../../entities/user';
 
 export interface MutationAddUserArgs {
   username: string;

@@ -5,7 +5,6 @@ import { gql } from 'apollo-server-express';
 import { User } from '../../entities/User';
 
 // Utils
-import { getRepository } from 'typeorm';
 import bcrypt from 'bcrypt';
 import { validateEmail } from '../../utils/validator';
 import sendEmail from '../../utils/sendEmail';
@@ -62,8 +61,7 @@ export const resolvers: IResolvers = {
       if (!req.session.userId) {
         return null;
       }
-      const userRepository = getRepository(User);
-      return userRepository.findOne({ id: req.session.userId });
+      return User.findOne({ id: req.session.userId });
     },
   },
 
@@ -73,14 +71,13 @@ export const resolvers: IResolvers = {
       { username, email, password }: MutationAddUserArgs,
       context: GraphQLContext,
     ): MutationAddUserReturn {
-      const userRepository = getRepository(User);
-      let theUser = await userRepository.findOne({ where: { username } });
+      let theUser = await User.findOne({ where: { username } });
       if (theUser) {
         return {
           error: { fieldName: 'username', message: 'Username already exists' },
         };
       }
-      theUser = await userRepository.findOne({ where: { email } });
+      theUser = await User.findOne({ where: { email } });
       if (theUser) {
         return {
           error: { fieldName: 'email', message: 'Email already exists' },
@@ -90,7 +87,7 @@ export const resolvers: IResolvers = {
       newUser.username = username;
       newUser.email = email;
       newUser.password = await bcrypt.hash(password, 10);
-      newUser = await userRepository.save(newUser);
+      newUser = await User.save(newUser);
 
       context.req.session.userId = newUser.id;
 
@@ -98,9 +95,7 @@ export const resolvers: IResolvers = {
     },
 
     async login(_, { usernameOrEmail, password }: MutationLoginArgs, context: GraphQLContext): MutationLoginReturn {
-      const userRepository = getRepository(User);
-
-      const theUser = await userRepository.findOne({
+      const theUser = await User.findOne({
         where: validateEmail(usernameOrEmail) ? { email: usernameOrEmail } : { username: usernameOrEmail },
       });
       if (!theUser) {
@@ -136,8 +131,7 @@ export const resolvers: IResolvers = {
     },
 
     async forgetPassword(_, { email }: MutationForgetPasswordArgs, { redis }: GraphQLContext): Promise<boolean> {
-      const userRepository = getRepository(User);
-      const theUser = await userRepository.findOne({ where: { email } });
+      const theUser = await User.findOne({ where: { email } });
       if (!theUser) {
         return true;
       }
@@ -164,15 +158,14 @@ export const resolvers: IResolvers = {
           error: { fieldName: 'token', message: 'Token is expired' },
         };
       }
-      const userRepository = getRepository(User);
-      const theUser = await userRepository.findOne({ where: { id: userId } });
+      const theUser = await User.findOne({ where: { id: userId } });
       if (!theUser) {
         return {
           error: { fieldName: 'token', message: 'User does not exist' },
         };
       }
       theUser.password = await bcrypt.hash(password, 10);
-      await userRepository.save(theUser);
+      await User.save(theUser);
 
       req.session.userId = theUser.id;
 

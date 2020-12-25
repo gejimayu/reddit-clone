@@ -4,9 +4,6 @@ import { gql, IResolvers } from 'apollo-server-express';
 // Entities
 import { Post } from '../../entities/post';
 
-// Utils
-import { getRepository } from 'typeorm';
-
 // Types
 import { MutationCreatePostArgs, MutationUpdatePostArgs, MutationDeletePostArgs } from './types';
 
@@ -32,29 +29,25 @@ export const typeDefs = gql`
 export const resolvers: IResolvers = {
   Query: {
     posts() {
-      const postRepository = getRepository(Post);
-      return postRepository.find({});
+      return Post.find({});
     },
   },
   Mutation: {
     async createPost(_, { title }: MutationCreatePostArgs) {
-      const postRepository = getRepository(Post);
       const newPost = new Post();
       newPost.title = title;
-      return postRepository.save(newPost);
+      return Post.save(newPost);
     },
     async updatePost(_, { id, title }: MutationUpdatePostArgs) {
-      const postRepository = getRepository(Post);
-      const currentPost = await postRepository.findOne(id);
+      const currentPost = await Post.findOne(id);
       if (currentPost) {
         currentPost.title = title;
-        await postRepository.save(currentPost);
+        await Post.save(currentPost);
       }
       return currentPost;
     },
     async deletePost(_, { id }: MutationDeletePostArgs) {
-      const postRepository = getRepository(Post);
-      await postRepository.delete(id);
+      await Post.delete(id);
       return true;
     },
   },

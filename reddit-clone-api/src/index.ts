@@ -29,7 +29,7 @@ const main = async () => {
   const app = express();
 
   // DB setup
-  const orm = await createConnection();
+  await createConnection();
   console.log('Successfully connected to database');
 
   // Middlewares
@@ -62,7 +62,7 @@ const main = async () => {
   const apolloServer = new ApolloServer({
     typeDefs: [baseTypeDefs, userTypeDefs, postTypeDefs],
     resolvers: [userResolvers, postResolvers],
-    context: ({ req, res }): GraphQLContext => ({ ormManager: orm.manager, req, res, redis }),
+    context: ({ req, res }): GraphQLContext => ({ req, res, redis }),
   });
   apolloServer.applyMiddleware({
     app,

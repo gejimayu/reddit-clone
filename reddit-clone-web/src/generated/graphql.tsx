@@ -22,16 +22,21 @@ export type Scalars = {
 export type Query = {
   __typename?: 'Query';
   me?: Maybe<User>;
-  posts?: Maybe<Array<Maybe<Post>>>;
+  posts?: Maybe<QueryPostsResponse>;
+};
+
+export type QueryPostsArgs = {
+  limit: Scalars['Int'];
+  cursor?: Maybe<Scalars['String']>;
 };
 
 export type Mutation = {
   __typename?: 'Mutation';
-  addUser?: Maybe<Response>;
-  login?: Maybe<Response>;
+  addUser?: Maybe<UserResponse>;
+  login?: Maybe<UserResponse>;
   logout?: Maybe<Scalars['Boolean']>;
   forgetPassword?: Maybe<Scalars['Boolean']>;
-  changePassword?: Maybe<Response>;
+  changePassword?: Maybe<UserResponse>;
   createPost?: Maybe<PostResponse>;
   updatePost?: Maybe<Post>;
   deletePost?: Maybe<Scalars['Boolean']>;
@@ -87,8 +92,8 @@ export type User = {
   updatedAt?: Maybe<Scalars['String']>;
 };
 
-export type Response = {
-  __typename?: 'Response';
+export type UserResponse = {
+  __typename?: 'UserResponse';
   user?: Maybe<User>;
   error?: Maybe<Error>;
 };
@@ -110,10 +115,21 @@ export type PostResponse = {
   error?: Maybe<Error>;
 };
 
+export type QueryPostsResponse = {
+  __typename?: 'QueryPostsResponse';
+  posts?: Maybe<Array<Maybe<Post>>>;
+  hasMore: Scalars['Boolean'];
+};
+
 export enum CacheControlScope {
   Public = 'PUBLIC',
   Private = 'PRIVATE',
 }
+
+export type PostInfoFragment = { __typename?: 'Post' } & Pick<
+  Post,
+  'id' | 'title' | 'text' | 'points' | 'creatorId' | 'createdAt'
+>;
 
 export type UserBasicInfoFragment = { __typename?: 'User' } & Pick<
   User,
@@ -127,7 +143,7 @@ export type ChangePasswordMutationVariables = Exact<{
 
 export type ChangePasswordMutation = { __typename?: 'Mutation' } & {
   changePassword?: Maybe<
-    { __typename?: 'Response' } & {
+    { __typename?: 'UserResponse' } & {
       error?: Maybe<
         { __typename?: 'Error' } & Pick<Error, 'fieldName' | 'message'>
       >;
@@ -177,7 +193,7 @@ export type LoginMutationVariables = Exact<{
 
 export type LoginMutation = { __typename?: 'Mutation' } & {
   login?: Maybe<
-    { __typename?: 'Response' } & {
+    { __typename?: 'UserResponse' } & {
       error?: Maybe<
         { __typename?: 'Error' } & Pick<Error, 'fieldName' | 'message'>
       >;
@@ -201,7 +217,7 @@ export type AddUserMutationVariables = Exact<{
 
 export type AddUserMutation = { __typename?: 'Mutation' } & {
   addUser?: Maybe<
-    { __typename?: 'Response' } & {
+    { __typename?: 'UserResponse' } & {
       error?: Maybe<
         { __typename?: 'Error' } & Pick<Error, 'fieldName' | 'message'>
       >;
@@ -216,14 +232,32 @@ export type MeQuery = { __typename?: 'Query' } & {
   me?: Maybe<{ __typename?: 'User' } & UserBasicInfoFragment>;
 };
 
-export type PostsQueryVariables = Exact<{ [key: string]: never }>;
+export type PostsQueryVariables = Exact<{
+  limit: Scalars['Int'];
+  cursor?: Maybe<Scalars['String']>;
+}>;
 
 export type PostsQuery = { __typename?: 'Query' } & {
   posts?: Maybe<
-    Array<Maybe<{ __typename?: 'Post' } & Pick<Post, 'id' | 'title'>>>
+    { __typename?: 'QueryPostsResponse' } & Pick<
+      QueryPostsResponse,
+      'hasMore'
+    > & {
+        posts?: Maybe<Array<Maybe<{ __typename?: 'Post' } & PostInfoFragment>>>;
+      }
   >;
 };
 
+export const PostInfoFragmentDoc = gql`
+  fragment PostInfo on Post {
+    id
+    title
+    text
+    points
+    creatorId
+    createdAt
+  }
+`;
 export const UserBasicInfoFragmentDoc = gql`
   fragment UserBasicInfo on User {
     id
@@ -586,12 +620,15 @@ export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
 export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
 export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
 export const PostsDocument = gql`
-  query Posts {
-    posts {
-      id
-      title
+  query Posts($limit: Int!, $cursor: String) {
+    posts(limit: $limit, cursor: $cursor) {
+      posts {
+        ...PostInfo
+      }
+      hasMore
     }
   }
+  ${PostInfoFragmentDoc}
 `;
 
 /**
@@ -606,11 +643,13 @@ export const PostsDocument = gql`
  * @example
  * const { data, loading, error } = usePostsQuery({
  *   variables: {
+ *      limit: // value for 'limit'
+ *      cursor: // value for 'cursor'
  *   },
  * });
  */
 export function usePostsQuery(
-  baseOptions?: Apollo.QueryHookOptions<PostsQuery, PostsQueryVariables>
+  baseOptions: Apollo.QueryHookOptions<PostsQuery, PostsQueryVariables>
 ) {
   return Apollo.useQuery<PostsQuery, PostsQueryVariables>(
     PostsDocument,

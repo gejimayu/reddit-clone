@@ -7,12 +7,20 @@ import { Post } from '../../entities/post';
 // Middlewares
 import isAuthenticated from '../middlewares/isAuthenticated';
 
+// Constants
+import { LIMIT_POST } from './constants';
+
+// Utils
+import { getRepository } from 'typeorm';
+
 // Types
 import {
+  QueryGetPostsArgs,
   MutationCreatePostArgs,
   MutationUpdatePostArgs,
   MutationDeletePostArgs,
   MutationCreatePostReturn,
+  QueryGetPostsReturn,
 } from './types';
 import { GraphQLContext } from '../../types/context';
 
@@ -32,8 +40,13 @@ export const typeDefs = gql`
     error: Error
   }
 
-  extend type Query {
+  type QueryPostsResponse {
     posts: [Post]
+    hasMore: Boolean!
+  }
+
+  extend type Query {
+    posts(limit: Int!, cursor: String): QueryPostsResponse
   }
 
   extend type Mutation {
@@ -45,8 +58,24 @@ export const typeDefs = gql`
 
 export const resolvers: IResolvers = {
   Query: {
-    posts() {
-      return Post.find({});
+    async posts(_, { limit, cursor }: QueryGetPostsArgs): QueryGetPostsReturn {
+      const realLimit = Math.min(LIMIT_POST, limit);
+
+      const queryBuilder = getRepository(Post)
+        .createQueryBuilder('user')
+        .orderBy('user.createdAt', 'DESC')
+        .take(realLimit + 1); // to get the next cursor
+
+      if (cursor) {
+        queryBuilder.where('user.createdAt < :cursor', { cursor: new Date(parseInt(cursor)) });
+      }
+
+      const posts = await queryBuilder.getMany();
+
+      return {
+        posts: posts.slice(0, realLimit),
+        hasMore: posts.length > realLimit,
+      };
     },
   },
   Mutation: {

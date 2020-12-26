@@ -16,7 +16,7 @@ const ChangePassword: React.FC = () => {
   const router = useRouter();
 
   return (
-    <Container>
+    <Container variant="small">
       <Formik
         initialValues={{ newPassword: '' }}
         onSubmit={async (values, { setErrors }) => {

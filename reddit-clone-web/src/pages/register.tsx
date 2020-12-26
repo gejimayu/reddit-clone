@@ -16,7 +16,7 @@ const Register: React.FC = () => {
   const router = useRouter();
 
   return (
-    <Container>
+    <Container variant="small">
       <Formik
         initialValues={{ username: '', email: '', password: '' }}
         onSubmit={async (values, { setErrors }) => {

@@ -18,7 +18,7 @@ const ForgetPassword: React.FC = () => {
   const [forgetPassword] = useForgetPasswordMutation();
 
   return (
-    <Container>
+    <Container variant="small">
       {!isComplete ? (
         <Formik
           initialValues={{ email: '' }}

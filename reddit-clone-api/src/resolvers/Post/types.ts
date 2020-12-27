@@ -17,6 +17,10 @@ export interface MutationUpdatePostArgs {
 export interface MutationDeletePostArgs {
   id: string;
 }
+export interface MutationUpvoteArgs {
+  postId: number;
+  point: number;
+}
 
 export type QueryGetPostsReturn = Promise<{
   posts: Post[];

@@ -3,6 +3,7 @@ import { gql, IResolvers } from 'apollo-server-express';
 
 // Entities
 import { Post } from '../../entities/post';
+import { PostUpvoters } from '../../entities/post_upvoters';
 
 // Middlewares
 import isAuthenticated from '../middlewares/isAuthenticated';
@@ -11,7 +12,7 @@ import isAuthenticated from '../middlewares/isAuthenticated';
 import { LIMIT_POST } from './constants';
 
 // Utils
-import { getRepository } from 'typeorm';
+import { getRepository, getManager } from 'typeorm';
 
 // Types
 import {
@@ -20,6 +21,7 @@ import {
   MutationUpdatePostArgs,
   MutationDeletePostArgs,
   MutationCreatePostReturn,
+  MutationUpvoteArgs,
   QueryGetPostsReturn,
 } from './types';
 import { GraphQLContext } from '../../types/context';
@@ -54,6 +56,7 @@ export const typeDefs = gql`
     createPost(title: String!, text: String!): PostResponse
     updatePost(id: ID!, title: String!, text: String!): Post
     deletePost(id: ID!): Boolean
+    upvote(postId: ID!, point: Int!): Boolean
   }
 `;
 
@@ -120,6 +123,56 @@ export const resolvers: IResolvers = {
 
     async deletePost(_, { id }: MutationDeletePostArgs) {
       await Post.delete(id);
+      return true;
+    },
+
+    async upvote(_, { postId, point }: MutationUpvoteArgs, context: GraphQLContext) {
+      isAuthenticated(context);
+
+      const { userId } = context.req.session;
+      const realPoint = point > 0 ? 1 : -1;
+
+      const upvote = await PostUpvoters.findOne({ userId, postId });
+
+      // check if the user has upvoted the post before and they're changing the vote
+      await getManager().transaction('READ COMMITTED', async (transactionalEntityManager) => {
+        if (upvote && upvote.point !== realPoint) {
+          await transactionalEntityManager.query(
+            `
+              UPDATE post_upvoters 
+              SET point = $1
+              WHERE "postId" = $2 AND "userId" = $3
+            `,
+            [realPoint, postId, userId],
+          );
+          await transactionalEntityManager.query(
+            `
+              UPDATE post 
+              SET points = points + $1
+              WHERE id = $2
+            `,
+            [2 * realPoint, postId],
+          );
+        } else if (!upvote) {
+          // if user has never voted to this post before
+          await transactionalEntityManager.query(
+            `
+                INSERT INTO post_upvoters ("userId", "postId", "point")
+                VALUES ($1, $2, $3)
+              `,
+            [userId, postId, realPoint],
+          );
+          await transactionalEntityManager.query(
+            `
+                UPDATE post 
+                SET points = points + $1
+                WHERE id = $2
+              `,
+            [realPoint, postId],
+          );
+        }
+      });
+
       return true;
     },
   },

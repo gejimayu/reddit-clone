@@ -30,6 +30,7 @@ export const typeDefs = gql`
     title: String!
     text: String!
     creatorId: ID!
+    creator: User!
     points: Int!
     createdAt: String!
     updatedAt: String
@@ -62,12 +63,13 @@ export const resolvers: IResolvers = {
       const realLimit = Math.min(LIMIT_POST, limit);
 
       const queryBuilder = getRepository(Post)
-        .createQueryBuilder('user')
-        .orderBy('user.createdAt', 'DESC')
+        .createQueryBuilder('post')
+        .innerJoinAndSelect('post.creator', 'user')
+        .orderBy('post.createdAt', 'DESC')
         .take(realLimit + 1); // to get the next cursor
 
       if (cursor) {
-        queryBuilder.where('user.createdAt < :cursor', { cursor: new Date(parseInt(cursor)) });
+        queryBuilder.where('post.createdAt < :cursor', { cursor: new Date(parseInt(cursor)) });
       }
 
       const posts = await queryBuilder.getMany();

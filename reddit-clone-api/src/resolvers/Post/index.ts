@@ -58,6 +58,15 @@ export const typeDefs = gql`
 `;
 
 export const resolvers: IResolvers = {
+  Post: {
+    creator(parent: Post): { id: number; username: string } {
+      // hide creator's mail and other info, we only need username and id
+      return {
+        id: parent.creator.id,
+        username: parent.creator.username,
+      };
+    },
+  },
   Query: {
     async posts(_, { limit, cursor }: QueryGetPostsArgs): QueryGetPostsReturn {
       const realLimit = Math.min(LIMIT_POST, limit);

@@ -6,9 +6,13 @@ import {
   UpdateDateColumn,
   BaseEntity,
   ManyToOne,
+  ManyToMany,
+  OneToMany,
+  JoinTable,
 } from 'typeorm';
 
 import { User } from './user';
+import { PostUpvoters } from './post_upvoters';
 
 @Entity()
 export class Post extends BaseEntity {
@@ -35,4 +39,11 @@ export class Post extends BaseEntity {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @ManyToMany(() => User, { cascade: ['remove'] })
+  @JoinTable({ name: 'post_upvoters' })
+  upvoter: User[];
+
+  @OneToMany(() => PostUpvoters, (upvotes) => upvotes.post)
+  upvotes: PostUpvoters[];
 }

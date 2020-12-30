@@ -136,7 +136,7 @@ export enum CacheControlScope {
 export type PostInfoFragment = { __typename?: 'Post' } & Pick<
   Post,
   'id' | 'title' | 'text' | 'points' | 'creatorId' | 'createdAt'
->;
+> & { creator: { __typename?: 'User' } & Pick<User, 'username'> };
 
 export type UserBasicInfoFragment = { __typename?: 'User' } & Pick<
   User,
@@ -250,15 +250,7 @@ export type PostsQuery = { __typename?: 'Query' } & {
       QueryPostsResponse,
       'hasMore'
     > & {
-        posts?: Maybe<
-          Array<
-            Maybe<
-              { __typename?: 'Post' } & {
-                creator: { __typename?: 'User' } & Pick<User, 'username'>;
-              } & PostInfoFragment
-            >
-          >
-        >;
+        posts?: Maybe<Array<Maybe<{ __typename?: 'Post' } & PostInfoFragment>>>;
       }
   >;
 };
@@ -271,6 +263,9 @@ export const PostInfoFragmentDoc = gql`
     points
     creatorId
     createdAt
+    creator {
+      username
+    }
   }
 `;
 export const UserBasicInfoFragmentDoc = gql`
@@ -639,9 +634,6 @@ export const PostsDocument = gql`
     posts(limit: $limit, cursor: $cursor) {
       posts {
         ...PostInfo
-        creator {
-          username
-        }
       }
       hasMore
     }

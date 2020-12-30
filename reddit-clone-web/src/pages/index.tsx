@@ -1,11 +1,12 @@
 // Hooks
-import { Post, usePostsQuery } from '../generated/graphql';
+import { usePostsQuery } from '../generated/graphql';
 
 // HOC
 import withApollo from '../hocs/withApollo';
 
 // Components
 import Layout from '../components/Layout';
+import UpvoteSection from '../components/UpvoteSection';
 import {
   Link,
   Stack,
@@ -39,11 +40,16 @@ const Index: React.FC = () => {
         posts.map((post) => (
           <Stack marginY="30px">
             <Box padding={5} shadow="md" borderWidth="1px">
-              <Heading fontSize="xl">{post?.title}</Heading>
-              <Text>Posted by {post?.creator.username}</Text>
-              <Text marginTop="16px">
-                {post?.text.slice(0, MAX_TEXT_LEN)}.....
-              </Text>
+              <Flex>
+                <UpvoteSection post={post} />
+                <Box marginLeft="15px">
+                  <Heading fontSize="xl">{post?.title}</Heading>
+                  <Text>Posted by {post?.creator.username}</Text>
+                  <Text marginTop="16px">
+                    {post?.text.slice(0, MAX_TEXT_LEN)}.....
+                  </Text>
+                </Box>
+              </Flex>
             </Box>
           </Stack>
         ))

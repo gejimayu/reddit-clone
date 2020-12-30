@@ -5,4 +5,7 @@ fragment PostInfo on Post {
   points
   creatorId
   createdAt
+  creator {
+    username
+  }
 }

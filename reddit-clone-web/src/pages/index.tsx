@@ -36,20 +36,23 @@ const Index: React.FC = () => {
       {!data && loading ? (
         <p>Loading ...</p>
       ) : posts ? (
-        posts.map((post) => (
-          <Stack marginY="30px">
-            <Box padding={5} shadow="md" borderWidth="1px">
-              <Flex>
-                <UpvoteSection post={post} />
-                <Box marginLeft="15px">
-                  <Heading fontSize="xl">{post?.title}</Heading>
-                  <Text>Posted by {post?.creator.username}</Text>
-                  <Text marginTop="16px">{post?.textSnippet}.....</Text>
+        posts.map(
+          (post) =>
+            post && (
+              <Stack marginY="30px" key={post.id}>
+                <Box padding={5} shadow="md" borderWidth="1px">
+                  <Flex>
+                    <UpvoteSection post={post} />
+                    <Box marginLeft="15px">
+                      <Heading fontSize="xl">{post.title}</Heading>
+                      <Text>Posted by {post.creator.username}</Text>
+                      <Text marginTop="16px">{post.textSnippet}.....</Text>
+                    </Box>
+                  </Flex>
                 </Box>
-              </Flex>
-            </Box>
-          </Stack>
-        ))
+              </Stack>
+            )
+        )
       ) : null}
       {posts.length > 0 && hasMore && (
         <Flex>

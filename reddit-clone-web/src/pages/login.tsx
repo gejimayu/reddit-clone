@@ -13,7 +13,11 @@ import { Button, Link, Flex } from '@chakra-ui/react';
 import NextLink from 'next/link';
 
 const Login: React.FC = () => {
-  const [login] = useLoginMutation();
+  const [login] = useLoginMutation({
+    update(cache) {
+      cache.evict({ id: 'ROOT_QUERY', fieldName: 'me' });
+    },
+  });
   const router = useRouter();
 
   return (

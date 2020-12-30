@@ -1,5 +1,5 @@
 // Hooks
-import { usePostsQuery } from '../generated/graphql';
+import { Post, usePostsQuery } from '../generated/graphql';
 
 // HOC
 import withApollo from '../hocs/withApollo';
@@ -40,6 +40,7 @@ const Index: React.FC = () => {
           <Stack marginY="30px">
             <Box padding={5} shadow="md" borderWidth="1px">
               <Heading fontSize="xl">{post?.title}</Heading>
+              <Text>Posted by {post?.creator.username}</Text>
               <Text marginTop="16px">
                 {post?.text.slice(0, MAX_TEXT_LEN)}.....
               </Text>

@@ -40,6 +40,7 @@ export type Mutation = {
   createPost?: Maybe<PostResponse>;
   updatePost?: Maybe<Post>;
   deletePost?: Maybe<Scalars['Boolean']>;
+  upvote?: Maybe<Scalars['Boolean']>;
 };
 
 export type MutationAddUserArgs = {
@@ -77,6 +78,11 @@ export type MutationDeletePostArgs = {
   id: Scalars['ID'];
 };
 
+export type MutationUpvoteArgs = {
+  postId: Scalars['ID'];
+  point: Scalars['Int'];
+};
+
 export type Error = {
   __typename?: 'Error';
   fieldName?: Maybe<Scalars['String']>;
@@ -104,6 +110,7 @@ export type Post = {
   title: Scalars['String'];
   text: Scalars['String'];
   creatorId: Scalars['ID'];
+  creator: User;
   points: Scalars['Int'];
   createdAt: Scalars['String'];
   updatedAt?: Maybe<Scalars['String']>;
@@ -243,7 +250,15 @@ export type PostsQuery = { __typename?: 'Query' } & {
       QueryPostsResponse,
       'hasMore'
     > & {
-        posts?: Maybe<Array<Maybe<{ __typename?: 'Post' } & PostInfoFragment>>>;
+        posts?: Maybe<
+          Array<
+            Maybe<
+              { __typename?: 'Post' } & {
+                creator: { __typename?: 'User' } & Pick<User, 'username'>;
+              } & PostInfoFragment
+            >
+          >
+        >;
       }
   >;
 };
@@ -624,6 +639,9 @@ export const PostsDocument = gql`
     posts(limit: $limit, cursor: $cursor) {
       posts {
         ...PostInfo
+        creator {
+          username
+        }
       }
       hasMore
     }

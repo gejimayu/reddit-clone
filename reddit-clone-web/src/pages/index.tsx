@@ -18,7 +18,6 @@ import {
 } from '@chakra-ui/react';
 import NextLink from 'next/link';
 
-const MAX_TEXT_LEN = 100;
 const PAGINATION_LIMIT = 10;
 
 const Index: React.FC = () => {
@@ -45,9 +44,7 @@ const Index: React.FC = () => {
                 <Box marginLeft="15px">
                   <Heading fontSize="xl">{post?.title}</Heading>
                   <Text>Posted by {post?.creator.username}</Text>
-                  <Text marginTop="16px">
-                    {post?.text.slice(0, MAX_TEXT_LEN)}.....
-                  </Text>
+                  <Text marginTop="16px">{post?.textSnippet}.....</Text>
                 </Box>
               </Flex>
             </Box>

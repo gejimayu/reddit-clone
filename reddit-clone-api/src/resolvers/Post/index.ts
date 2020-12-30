@@ -31,6 +31,7 @@ export const typeDefs = gql`
     id: ID!
     title: String!
     text: String!
+    textSnippet: String!
     creatorId: ID!
     creator: User!
     points: Int!
@@ -62,6 +63,9 @@ export const typeDefs = gql`
 
 export const resolvers: IResolvers = {
   Post: {
+    textSnippet(parent: Post): string {
+      return parent.text.slice(0, 100);
+    },
     creator(parent: Post): { id: number; username: string } {
       // hide creator's mail and other info, we only need username and id
       return {

@@ -1,0 +1,3 @@
+mutation Upvote($postId: ID!, $point: Int!) {
+  upvote(postId: $postId, point: $point)
+}

@@ -109,6 +109,7 @@ export type Post = {
   id: Scalars['ID'];
   title: Scalars['String'];
   text: Scalars['String'];
+  textSnippet: Scalars['String'];
   creatorId: Scalars['ID'];
   creator: User;
   points: Scalars['Int'];
@@ -133,9 +134,9 @@ export enum CacheControlScope {
   Private = 'PRIVATE',
 }
 
-export type PostInfoFragment = { __typename?: 'Post' } & Pick<
+export type PostSnippetFragment = { __typename?: 'Post' } & Pick<
   Post,
-  'id' | 'title' | 'text' | 'points' | 'creatorId' | 'createdAt'
+  'id' | 'title' | 'textSnippet' | 'points' | 'creatorId' | 'createdAt'
 > & { creator: { __typename?: 'User' } & Pick<User, 'username'> };
 
 export type UserBasicInfoFragment = { __typename?: 'User' } & Pick<
@@ -233,6 +234,16 @@ export type AddUserMutation = { __typename?: 'Mutation' } & {
   >;
 };
 
+export type UpvoteMutationVariables = Exact<{
+  postId: Scalars['ID'];
+  point: Scalars['Int'];
+}>;
+
+export type UpvoteMutation = { __typename?: 'Mutation' } & Pick<
+  Mutation,
+  'upvote'
+>;
+
 export type MeQueryVariables = Exact<{ [key: string]: never }>;
 
 export type MeQuery = { __typename?: 'Query' } & {
@@ -250,16 +261,18 @@ export type PostsQuery = { __typename?: 'Query' } & {
       QueryPostsResponse,
       'hasMore'
     > & {
-        posts?: Maybe<Array<Maybe<{ __typename?: 'Post' } & PostInfoFragment>>>;
+        posts?: Maybe<
+          Array<Maybe<{ __typename?: 'Post' } & PostSnippetFragment>>
+        >;
       }
   >;
 };
 
-export const PostInfoFragmentDoc = gql`
-  fragment PostInfo on Post {
+export const PostSnippetFragmentDoc = gql`
+  fragment PostSnippet on Post {
     id
     title
-    text
+    textSnippet
     points
     creatorId
     createdAt
@@ -589,6 +602,51 @@ export type AddUserMutationOptions = Apollo.BaseMutationOptions<
   AddUserMutation,
   AddUserMutationVariables
 >;
+export const UpvoteDocument = gql`
+  mutation Upvote($postId: ID!, $point: Int!) {
+    upvote(postId: $postId, point: $point)
+  }
+`;
+export type UpvoteMutationFn = Apollo.MutationFunction<
+  UpvoteMutation,
+  UpvoteMutationVariables
+>;
+
+/**
+ * __useUpvoteMutation__
+ *
+ * To run a mutation, you first call `useUpvoteMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpvoteMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [upvoteMutation, { data, loading, error }] = useUpvoteMutation({
+ *   variables: {
+ *      postId: // value for 'postId'
+ *      point: // value for 'point'
+ *   },
+ * });
+ */
+export function useUpvoteMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    UpvoteMutation,
+    UpvoteMutationVariables
+  >
+) {
+  return Apollo.useMutation<UpvoteMutation, UpvoteMutationVariables>(
+    UpvoteDocument,
+    baseOptions
+  );
+}
+export type UpvoteMutationHookResult = ReturnType<typeof useUpvoteMutation>;
+export type UpvoteMutationResult = Apollo.MutationResult<UpvoteMutation>;
+export type UpvoteMutationOptions = Apollo.BaseMutationOptions<
+  UpvoteMutation,
+  UpvoteMutationVariables
+>;
 export const MeDocument = gql`
   query Me {
     me {
@@ -633,12 +691,12 @@ export const PostsDocument = gql`
   query Posts($limit: Int!, $cursor: String) {
     posts(limit: $limit, cursor: $cursor) {
       posts {
-        ...PostInfo
+        ...PostSnippet
       }
       hasMore
     }
   }
-  ${PostInfoFragmentDoc}
+  ${PostSnippetFragmentDoc}
 `;
 
 /**

@@ -1,7 +1,7 @@
-fragment PostInfo on Post {
+fragment PostSnippet on Post {
   id
   title
-  text
+  textSnippet
   points
   creatorId
   createdAt

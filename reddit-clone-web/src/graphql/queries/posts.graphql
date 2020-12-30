@@ -1,7 +1,7 @@
 query Posts($limit: Int!, $cursor: String) {
   posts(limit: $limit, cursor: $cursor) {
     posts {
-      ...PostInfo
+      ...PostSnippet
     }
     hasMore
   }

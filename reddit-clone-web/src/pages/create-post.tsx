@@ -17,7 +17,11 @@ import { Button } from '@chakra-ui/react';
 
 const CreatePost: React.FC = () => {
   useIsLoggedIn();
-  const [createPost] = useCreatePostMutation();
+  const [createPost] = useCreatePostMutation({
+    update(cache) {
+      cache.evict({ id: 'ROOT_QUERY', fieldName: 'posts' });
+    },
+  });
   const router = useRouter();
 
   return (

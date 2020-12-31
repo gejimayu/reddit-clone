@@ -8,6 +8,7 @@ import withApollo from '../hocs/withApollo';
 import Layout from '../components/Layout';
 import CreateNewPostButton from '../components/CreateNewPostButton';
 import UpvoteSection from '../components/UpvoteSection';
+import EditDeletePostButtons from '../components/EditDeletePostButtons';
 import {
   Stack,
   Box,
@@ -42,14 +43,21 @@ const Index: React.FC = () => {
                   <Box padding={5} shadow="md" borderWidth="1px">
                     <Flex>
                       <UpvoteSection post={post} />
-                      <Box marginLeft="15px">
+                      <Box marginLeft="15px" width="100%">
                         <NextLink href="post/[postId]" as={`/post/${post.id}`}>
                           <Link>
                             <Heading fontSize="xl">{post.title}</Heading>
                           </Link>
                         </NextLink>
                         <Text>Posted by {post.creator.username}</Text>
-                        <Text marginTop="16px">{post.textSnippet}...</Text>
+                        <Flex
+                          alignItems="center"
+                          justifyContent="space-between"
+                          marginTop="16px"
+                        >
+                          <Text>{post.textSnippet}...</Text>
+                          <EditDeletePostButtons post={post} />
+                        </Flex>
                       </Box>
                     </Flex>
                   </Box>

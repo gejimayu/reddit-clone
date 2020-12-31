@@ -18,7 +18,7 @@ export interface MutationUpdatePostArgs {
   text: string;
 }
 export interface MutationDeletePostArgs {
-  id: string;
+  id: number;
 }
 export interface MutationUpvoteArgs {
   postId: number;

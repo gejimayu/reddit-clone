@@ -12,7 +12,7 @@ const CreateNewPostButton: React.FC = () => {
       bottom="50px"
       right="50px"
       borderRadius="50px"
-      colorScheme="red"
+      colorScheme="orange"
       onClick={() => {
         router.push('/create-post');
       }}

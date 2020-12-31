@@ -139,8 +139,11 @@ export const resolvers: IResolvers = {
       return currentPost;
     },
 
-    async deletePost(_, { id }: MutationDeletePostArgs) {
-      await Post.delete(id);
+    async deletePost(_, { id }: MutationDeletePostArgs, context: GraphQLContext) {
+      isAuthenticated(context);
+
+      const { userId } = context.req.session;
+      await Post.delete({ id, creatorId: userId });
       return true;
     },
 

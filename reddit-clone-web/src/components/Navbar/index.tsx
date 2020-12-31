@@ -9,9 +9,7 @@ import Image from 'next/image';
 import styles from './index.module.scss';
 
 const Navbar: React.FC = () => {
-  const { data } = useMeQuery({
-    ssr: false,
-  });
+  const { data } = useMeQuery();
   const [logout, { client, loading: isLogoutLoading }] = useLogoutMutation();
 
   return (

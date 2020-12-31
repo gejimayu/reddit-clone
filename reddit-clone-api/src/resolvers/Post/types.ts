@@ -13,7 +13,7 @@ export interface MutationCreatePostArgs {
   text: string;
 }
 export interface MutationUpdatePostArgs {
-  id: string;
+  id: number;
   title: string;
   text: string;
 }

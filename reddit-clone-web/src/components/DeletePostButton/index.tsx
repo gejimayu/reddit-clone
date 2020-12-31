@@ -12,7 +12,7 @@ type Props = {
   post: PostSnippetFragment;
 };
 
-const EditDeletePostButtons: React.FC<Props> = ({ post }) => {
+const DeletePostButtons: React.FC<Props> = ({ post }) => {
   const [deletePost, { loading: isDeletePostLoading }] = useDeletePostMutation({
     variables: { id: post.id },
     update(cache) {
@@ -25,7 +25,6 @@ const EditDeletePostButtons: React.FC<Props> = ({ post }) => {
       icon={<DeleteIcon />}
       aria-label="Delete post"
       colorScheme="red"
-      marginLeft="auto"
       isLoading={isDeletePostLoading}
       onClick={() => {
         deletePost();
@@ -34,4 +33,4 @@ const EditDeletePostButtons: React.FC<Props> = ({ post }) => {
   );
 };
 
-export default EditDeletePostButtons;
+export default DeletePostButtons;

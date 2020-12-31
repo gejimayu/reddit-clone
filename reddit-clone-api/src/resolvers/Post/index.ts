@@ -58,7 +58,7 @@ export const typeDefs = gql`
 
   extend type Mutation {
     createPost(title: String!, text: String!): PostResponse
-    updatePost(id: ID!, title: String!, text: String!): Post
+    updatePost(id: ID!, title: String, text: String): Post
     deletePost(id: ID!): Boolean
     upvote(postId: ID!, point: Int!): Post
   }
@@ -123,8 +123,11 @@ export const resolvers: IResolvers = {
       return { post: newPost };
     },
 
-    async updatePost(_, { id, title, text }: MutationUpdatePostArgs) {
-      const currentPost = await Post.findOne(id);
+    async updatePost(_, { id, title, text }: MutationUpdatePostArgs, context: GraphQLContext): Promise<Post | null> {
+      isAuthenticated(context);
+
+      const { userId } = context.req.session;
+      const currentPost = await Post.findOne({ id, creatorId: userId });
       if (!currentPost) {
         return null;
       }

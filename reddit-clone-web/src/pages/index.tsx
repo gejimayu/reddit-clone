@@ -8,7 +8,8 @@ import withApollo from '../hocs/withApollo';
 import Layout from '../components/Layout';
 import CreateNewPostButton from '../components/CreateNewPostButton';
 import UpvoteSection from '../components/UpvoteSection';
-import EditDeletePostButtons from '../components/EditDeletePostButtons';
+import DeletePostButtons from '../components/DeletePostButton';
+import EditPostButtons from '../components/EditPostButton';
 import {
   Stack,
   Box,
@@ -23,16 +24,14 @@ import NextLink from 'next/link';
 const PAGINATION_LIMIT = 10;
 
 const Index: React.FC = () => {
-  const { data: userData } = useMeQuery({
-    ssr: false,
-  });
+  const { data: userData } = useMeQuery();
   const { data, loading, fetchMore } = usePostsQuery({
     variables: { limit: PAGINATION_LIMIT },
   });
 
   const posts = data?.posts?.posts || [];
   const hasMore = data?.posts?.hasMore;
-  const userId = userData?.me?.id || -1;
+  const userId = userData?.me?.id;
 
   return (
     <>
@@ -61,7 +60,10 @@ const Index: React.FC = () => {
                         >
                           <Text>{post.textSnippet}...</Text>
                           {post.creatorId === userId && (
-                            <EditDeletePostButtons post={post} />
+                            <Flex>
+                              <EditPostButtons post={post} marginRight="15px" />
+                              <DeletePostButtons post={post} />
+                            </Flex>
                           )}
                         </Flex>
                       </Box>

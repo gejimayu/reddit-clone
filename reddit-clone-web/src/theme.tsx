@@ -10,12 +10,17 @@ const breakpoints = createBreakpoints({
   xl: '80em',
 });
 
+const zIndices = {
+  navbar: 1000,
+};
+
 const theme = extendTheme({
   colors: {
     black: '#16161D',
   },
   fonts,
   breakpoints,
+  zIndices,
 });
 
 export default theme;

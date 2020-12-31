@@ -1,0 +1,21 @@
+.navbarContainer {
+  background-color: white;
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  box-shadow: 0 0 10px -7px black;
+}
+
+.logoLink {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  text-decoration: none !important;
+}
+
+.logoText {
+  margin-left: 10px;
+  font-size: 1.3rem;
+  font-weight: bold;
+}

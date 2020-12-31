@@ -1,5 +1,5 @@
 // Hooks
-import { usePostsQuery } from '../generated/graphql';
+import { usePostsQuery, useMeQuery } from '../generated/graphql';
 
 // HOC
 import withApollo from '../hocs/withApollo';
@@ -23,12 +23,16 @@ import NextLink from 'next/link';
 const PAGINATION_LIMIT = 10;
 
 const Index: React.FC = () => {
+  const { data: userData } = useMeQuery({
+    ssr: false,
+  });
   const { data, loading, fetchMore } = usePostsQuery({
     variables: { limit: PAGINATION_LIMIT },
   });
 
   const posts = data?.posts?.posts || [];
   const hasMore = data?.posts?.hasMore;
+  const userId = userData?.me?.id || -1;
 
   return (
     <>
@@ -56,7 +60,9 @@ const Index: React.FC = () => {
                           marginTop="16px"
                         >
                           <Text>{post.textSnippet}...</Text>
-                          <EditDeletePostButtons post={post} />
+                          {post.creatorId === userId && (
+                            <EditDeletePostButtons post={post} />
+                          )}
                         </Flex>
                       </Box>
                     </Flex>

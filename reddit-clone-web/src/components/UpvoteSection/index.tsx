@@ -5,9 +5,6 @@ import { useUpvoteMutation } from '../../generated/graphql';
 import { Flex, IconButton } from '@chakra-ui/react';
 import { ChevronUpIcon, ChevronDownIcon } from '@chakra-ui/icons';
 
-// Utils
-import { gql } from '@apollo/client';
-
 // Types
 import { PostSnippetFragment } from '../../generated/graphql';
 

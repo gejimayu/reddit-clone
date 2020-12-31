@@ -6,7 +6,7 @@ import { Box, Flex, Link, Button } from '@chakra-ui/react';
 import NextLink from 'next/link';
 import Image from 'next/image';
 
-import styles from './Navbar.module.scss';
+import styles from './index.module.scss';
 
 const Navbar: React.FC = () => {
   const { data } = useMeQuery({

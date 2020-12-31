@@ -19,37 +19,19 @@ const UpvoteSection: React.FC<Props> = ({ post }) => {
   const [upvote] = useUpvoteMutation();
 
   const onClickUpvote = (point: 1 | -1) => {
-    const voteStatus = point;
+    const didUserUpvoteDifferently = post.voteStatus !== point;
     upvote({
       variables: { postId: post.id, point },
-      update(cache) {
-        const data = cache.readFragment<PostSnippetFragment>({
-          id: 'Post:' + post.id,
-          fragment: gql`
-            fragment _ on Post {
-              points
-              voteStatus
-            }
-          `,
-        });
-        if (data) {
-          cache.writeFragment({
-            id: 'Post:' + post.id,
-            fragment: gql`
-              fragment _ on Post {
-                points
-                voteStatus
-              }
-            `,
-            data: {
-              points:
-                post.voteStatus !== voteStatus // if vote status different, update points otherwise idem
-                  ? data.points + point
-                  : data.points,
-              voteStatus,
-            },
-          });
-        }
+      optimisticResponse: {
+        __typename: 'Mutation',
+        upvote: {
+          id: post.id,
+          __typename: 'Post',
+          voteStatus: didUserUpvoteDifferently ? point : 0,
+          points: didUserUpvoteDifferently
+            ? post.points + point
+            : post.points + point * -1,
+        },
       },
     });
   };

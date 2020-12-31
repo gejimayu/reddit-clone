@@ -46,7 +46,7 @@ const Index: React.FC = () => {
                     <Box marginLeft="15px">
                       <Heading fontSize="xl">{post.title}</Heading>
                       <Text>Posted by {post.creator.username}</Text>
-                      <Text marginTop="16px">{post.textSnippet}.....</Text>
+                      <Text marginTop="16px">{post.textSnippet}...</Text>
                     </Box>
                   </Flex>
                 </Box>

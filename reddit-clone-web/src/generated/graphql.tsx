@@ -113,6 +113,7 @@ export type Post = {
   creatorId: Scalars['ID'];
   creator: User;
   points: Scalars['Int'];
+  voteStatus: Scalars['Int'];
   createdAt: Scalars['String'];
   updatedAt?: Maybe<Scalars['String']>;
 };
@@ -136,7 +137,13 @@ export enum CacheControlScope {
 
 export type PostSnippetFragment = { __typename?: 'Post' } & Pick<
   Post,
-  'id' | 'title' | 'textSnippet' | 'points' | 'creatorId' | 'createdAt'
+  | 'id'
+  | 'title'
+  | 'textSnippet'
+  | 'points'
+  | 'voteStatus'
+  | 'creatorId'
+  | 'createdAt'
 > & { creator: { __typename?: 'User' } & Pick<User, 'username'> };
 
 export type UserBasicInfoFragment = { __typename?: 'User' } & Pick<
@@ -274,6 +281,7 @@ export const PostSnippetFragmentDoc = gql`
     title
     textSnippet
     points
+    voteStatus
     creatorId
     createdAt
     creator {

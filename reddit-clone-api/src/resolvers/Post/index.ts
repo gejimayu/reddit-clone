@@ -35,6 +35,7 @@ export const typeDefs = gql`
     creatorId: ID!
     creator: User!
     points: Int!
+    voteStatus: Int!
     createdAt: String!
     updatedAt: String
   }
@@ -72,6 +73,13 @@ export const resolvers: IResolvers = {
         id: parent.creator.id,
         username: parent.creator.username,
       };
+    },
+    async voteStatus(parent: Post, _, { req }: GraphQLContext): Promise<number> {
+      if (!req.session.userId) {
+        return 0;
+      }
+      const upvote = await PostUpvoters.findOne({ userId: req.session.userId, postId: parent.id });
+      return upvote?.point || 0;
     },
   },
   Query: {
@@ -155,7 +163,7 @@ export const resolvers: IResolvers = {
               SET points = points + $1
               WHERE id = $2
             `,
-            [2 * realPoint, postId],
+            [realPoint, postId],
           );
         } else if (!upvote) {
           // if user has never voted to this post before

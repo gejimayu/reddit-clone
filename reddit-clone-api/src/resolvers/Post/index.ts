@@ -16,6 +16,7 @@ import { getRepository, getManager } from 'typeorm';
 
 // Types
 import {
+  QueryGetPostArgs,
   QueryGetPostsArgs,
   MutationCreatePostArgs,
   MutationUpdatePostArgs,
@@ -51,6 +52,7 @@ export const typeDefs = gql`
   }
 
   extend type Query {
+    post(postId: ID!): Post
     posts(limit: Int!, cursor: String): QueryPostsResponse
   }
 
@@ -83,6 +85,10 @@ export const resolvers: IResolvers = {
     },
   },
   Query: {
+    async post(_, { postId }: QueryGetPostArgs): Promise<Post | undefined> {
+      return Post.findOne({ id: postId }, { relations: ['creator'] });
+    },
+
     async posts(_, { limit, cursor }: QueryGetPostsArgs): QueryGetPostsReturn {
       const realLimit = Math.min(LIMIT_POST, limit);
 

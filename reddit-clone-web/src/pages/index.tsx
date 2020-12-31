@@ -8,7 +8,16 @@ import withApollo from '../hocs/withApollo';
 import Layout from '../components/Layout';
 import CreateNewPostButton from '../components/CreateNewPostButton';
 import UpvoteSection from '../components/UpvoteSection';
-import { Stack, Box, Heading, Text, Button, Flex } from '@chakra-ui/react';
+import {
+  Stack,
+  Box,
+  Heading,
+  Text,
+  Button,
+  Flex,
+  Link,
+} from '@chakra-ui/react';
+import NextLink from 'next/link';
 
 const PAGINATION_LIMIT = 10;
 
@@ -34,7 +43,11 @@ const Index: React.FC = () => {
                     <Flex>
                       <UpvoteSection post={post} />
                       <Box marginLeft="15px">
-                        <Heading fontSize="xl">{post.title}</Heading>
+                        <NextLink href="post/[postId]" as={`/post/${post.id}`}>
+                          <Link>
+                            <Heading fontSize="xl">{post.title}</Heading>
+                          </Link>
+                        </NextLink>
                         <Text>Posted by {post.creator.username}</Text>
                         <Text marginTop="16px">{post.textSnippet}...</Text>
                       </Box>

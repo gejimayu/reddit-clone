@@ -1,6 +1,9 @@
 import { Error } from '../baseTypes';
 import { Post } from '../../entities/post';
 
+export interface QueryGetPostArgs {
+  postId: number;
+}
 export interface QueryGetPostsArgs {
   limit: number;
   cursor: string;

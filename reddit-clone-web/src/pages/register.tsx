@@ -12,7 +12,7 @@ import { Formik, Form } from 'formik';
 import { Button } from '@chakra-ui/react';
 
 const Register: React.FC = () => {
-  const [register, {}] = useAddUserMutation({
+  const [register, { client }] = useAddUserMutation({
     update(cache) {
       cache.evict({ id: 'ROOT_QUERY', fieldName: 'me' });
     },
@@ -33,6 +33,7 @@ const Register: React.FC = () => {
               setErrors({ email: error.message });
             }
           } else {
+            client.resetStore();
             router.push('/');
           }
         }}

@@ -1,3 +1,7 @@
 mutation Upvote($postId: ID!, $point: Int!) {
-  upvote(postId: $postId, point: $point)
+  upvote(postId: $postId, point: $point) {
+    id
+    points
+    voteStatus
+  }
 }

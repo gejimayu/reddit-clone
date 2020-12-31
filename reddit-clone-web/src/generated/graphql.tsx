@@ -40,7 +40,7 @@ export type Mutation = {
   createPost?: Maybe<PostResponse>;
   updatePost?: Maybe<Post>;
   deletePost?: Maybe<Scalars['Boolean']>;
-  upvote?: Maybe<Scalars['Boolean']>;
+  upvote?: Maybe<Post>;
 };
 
 export type MutationAddUserArgs = {
@@ -246,10 +246,11 @@ export type UpvoteMutationVariables = Exact<{
   point: Scalars['Int'];
 }>;
 
-export type UpvoteMutation = { __typename?: 'Mutation' } & Pick<
-  Mutation,
-  'upvote'
->;
+export type UpvoteMutation = { __typename?: 'Mutation' } & {
+  upvote?: Maybe<
+    { __typename?: 'Post' } & Pick<Post, 'id' | 'points' | 'voteStatus'>
+  >;
+};
 
 export type MeQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -612,7 +613,11 @@ export type AddUserMutationOptions = Apollo.BaseMutationOptions<
 >;
 export const UpvoteDocument = gql`
   mutation Upvote($postId: ID!, $point: Int!) {
-    upvote(postId: $postId, point: $point)
+    upvote(postId: $postId, point: $point) {
+      id
+      points
+      voteStatus
+    }
   }
 `;
 export type UpvoteMutationFn = Apollo.MutationFunction<

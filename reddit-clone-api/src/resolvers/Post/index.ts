@@ -58,7 +58,7 @@ export const typeDefs = gql`
     createPost(title: String!, text: String!): PostResponse
     updatePost(id: ID!, title: String!, text: String!): Post
     deletePost(id: ID!): Boolean
-    upvote(postId: ID!, point: Int!): Boolean
+    upvote(postId: ID!, point: Int!): Post
   }
 `;
 
@@ -138,32 +138,44 @@ export const resolvers: IResolvers = {
       return true;
     },
 
-    async upvote(_, { postId, point }: MutationUpvoteArgs, context: GraphQLContext) {
+    async upvote(_, { postId, point }: MutationUpvoteArgs, context: GraphQLContext): Promise<Post | undefined> {
       isAuthenticated(context);
 
       const { userId } = context.req.session;
-      const realPoint = point > 0 ? 1 : -1;
+      const newPoint = point > 0 ? 1 : -1;
 
       const upvote = await PostUpvoters.findOne({ userId, postId });
 
       // check if the user has upvoted the post before and they're changing the vote
       await getManager().transaction('READ COMMITTED', async (transactionalEntityManager) => {
-        if (upvote && upvote.point !== realPoint) {
-          await transactionalEntityManager.query(
-            `
-              UPDATE post_upvoters 
-              SET point = $1
-              WHERE "postId" = $2 AND "userId" = $3
-            `,
-            [realPoint, postId, userId],
-          );
+        if (upvote) {
+          if (upvote.point !== newPoint) {
+            await transactionalEntityManager.query(
+              `
+                UPDATE post_upvoters 
+                SET point = $1
+                WHERE "postId" = $2 AND "userId" = $3
+              `,
+              [newPoint, postId, userId],
+            );
+          } else {
+            // if new point is the same it means toggle off / remove the upvote
+            await transactionalEntityManager.query(
+              `
+                DELETE FROM post_upvoters 
+                WHERE "postId" = $1 AND "userId" = $2
+              `,
+              [postId, userId],
+            );
+          }
+          const pointToAdd = upvote.point === newPoint ? newPoint * -1 : newPoint;
           await transactionalEntityManager.query(
             `
               UPDATE post 
               SET points = points + $1
               WHERE id = $2
             `,
-            [realPoint, postId],
+            [pointToAdd, postId],
           );
         } else if (!upvote) {
           // if user has never voted to this post before
@@ -172,7 +184,7 @@ export const resolvers: IResolvers = {
                 INSERT INTO post_upvoters ("userId", "postId", "point")
                 VALUES ($1, $2, $3)
               `,
-            [userId, postId, realPoint],
+            [userId, postId, newPoint],
           );
           await transactionalEntityManager.query(
             `
@@ -180,12 +192,12 @@ export const resolvers: IResolvers = {
                 SET points = points + $1
                 WHERE id = $2
               `,
-            [realPoint, postId],
+            [newPoint, postId],
           );
         }
       });
 
-      return true;
+      return Post.findOne({ id: postId });
     },
   },
 };

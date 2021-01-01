@@ -26,12 +26,26 @@ import { __IS_PRODUCTION__ } from './constants/config';
 // Types
 import { GraphQLContext } from './types/context';
 
+function connectToDB() {
+  createConnection()
+    .then(() => {
+      console.log('Successfully connected to database');
+    })
+    .catch((err) => {
+      console.log(err);
+      // retry with 2s delay
+      setTimeout(() => {
+        console.log('retrying');
+        connectToDB();
+      }, 2000);
+    });
+}
+
 const main = async () => {
   const app = express();
 
   // DB setup
-  await createConnection();
-  console.log('Successfully connected to database');
+  connectToDB();
 
   // Middlewares
   app.use(
@@ -43,7 +57,10 @@ const main = async () => {
 
   // Redis/session setup
   const RedisStore = connectRedis(session);
-  const redis = new Redis();
+  const redis = new Redis({
+    host: process.env.REDIS_HOST,
+    port: parseInt(process.env.REDIS_PORT as string),
+  });
   app.use(
     session({
       name: COOKIE_NAME_LOGIN_SESSION,

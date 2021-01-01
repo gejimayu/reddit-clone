@@ -1,0 +1,28 @@
+version: "3.9"
+services:
+  reddit-clone-api:
+    build: .
+    ports:
+      - "4000:4000"
+    depends_on:
+      - redis
+      - main-database
+
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
+
+  main-database:
+    image: "postgres"
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=reddit-clone
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - postgres:/var/lib/postgresql/data/
+
+volumes:
+  postgres:

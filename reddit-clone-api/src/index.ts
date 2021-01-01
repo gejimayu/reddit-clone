@@ -21,6 +21,7 @@ import cors from 'cors';
 
 // Constants
 import { COOKIE_NAME_LOGIN_SESSION } from './constants/cookies';
+import { __IS_PRODUCTION__ } from './constants/config';
 
 // Types
 import { GraphQLContext } from './types/context';
@@ -35,7 +36,7 @@ const main = async () => {
   // Middlewares
   app.use(
     cors({
-      origin: 'http://localhost:3000',
+      origin: process.env.CORS_ORIGIN,
       credentials: true,
     }),
   );
@@ -51,9 +52,9 @@ const main = async () => {
         maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
         httpOnly: true,
         sameSite: 'lax',
-        secure: false, // TODO: turn on later
+        secure: __IS_PRODUCTION__,
       },
-      secret: 'dummy-secret',
+      secret: process.env.SESSION_SECRET as string,
       resave: false,
     }),
   );
@@ -75,8 +76,8 @@ const main = async () => {
   });
 
   // Start server
-  app.listen(4000, () => {
-    console.log('Server started on localhost:4000');
+  app.listen(process.env.PORT, () => {
+    console.log('Server started on port ' + process.env.PORT);
   });
 };
 

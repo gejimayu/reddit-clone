@@ -11,7 +11,8 @@ import FormContainer from '../components/FormContainer';
 import InputField from '../components/InputField';
 import SuccessPrompt from '../components/SuccessPrompt';
 import { Formik, Form } from 'formik';
-import { Button } from '@chakra-ui/react';
+import { Button, Link } from '@chakra-ui/react';
+import NextLink from 'next/link';
 
 // Utils
 import * as Yup from 'yup';
@@ -56,10 +57,17 @@ const ForgetPassword: React.FC = () => {
           )}
         </Formik>
       ) : (
-        <SuccessPrompt
-          title="Reset Password Success !"
-          content="A verification email has been sent. Please check to proceed further"
-        />
+        <>
+          <SuccessPrompt
+            title="Reset Password Success !"
+            content="A verification email has been sent. Please check to proceed further"
+          />
+          <NextLink href="/">
+            <Link display="block" textAlign="center">
+              Go to home page
+            </Link>
+          </NextLink>
+        </>
       )}
     </FormContainer>
   );

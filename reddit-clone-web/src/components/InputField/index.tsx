@@ -26,13 +26,14 @@ const InputField: React.FC<Props> = ({
   type,
   ...formControlProps
 }) => {
-  const [field, { error }] = useField(name);
+  const [field, { error, touched }] = useField(name);
 
+  const showError = touched && !!error;
   return (
-    <FormControl {...formControlProps} isInvalid={!!error}>
+    <FormControl {...formControlProps} isInvalid={showError}>
       <FormLabel htmlFor={name}>{label}</FormLabel>
       <Input {...field} type={type} id={name} placeholder={placeholder} />
-      {!!error && <FormErrorMessage>{error}</FormErrorMessage>}
+      {showError && <FormErrorMessage>{error}</FormErrorMessage>}
     </FormControl>
   );
 };

@@ -13,6 +13,19 @@ import SuccessPrompt from '../components/SuccessPrompt';
 import { Formik, Form } from 'formik';
 import { Button } from '@chakra-ui/react';
 
+// Utils
+import * as Yup from 'yup';
+
+enum FIELDS {
+  EMAIL = 'email',
+}
+
+const validationSchema = Yup.object().shape({
+  [FIELDS.EMAIL]: Yup.string()
+    .email('Please input a correct email address')
+    .required('This field is required'),
+});
+
 const ForgetPassword: React.FC = () => {
   const [isComplete, setIsComplete] = React.useState<boolean>(false);
   const [forgetPassword] = useForgetPasswordMutation();
@@ -21,7 +34,8 @@ const ForgetPassword: React.FC = () => {
     <Container variant="small">
       {!isComplete ? (
         <Formik
-          initialValues={{ email: '' }}
+          initialValues={{ [FIELDS.EMAIL]: '' }}
+          validationSchema={validationSchema}
           onSubmit={async (values) => {
             await forgetPassword({ variables: values });
             setIsComplete(true);
@@ -30,7 +44,7 @@ const ForgetPassword: React.FC = () => {
           {({ isSubmitting }) => (
             <Form>
               <InputField
-                name="email"
+                name={FIELDS.EMAIL}
                 label="Email"
                 placeholder="Email"
                 marginBottom="20px"

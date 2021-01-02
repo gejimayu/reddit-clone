@@ -17,6 +17,7 @@ type Props = React.HTMLProps<HTMLInputElement> &
     name: string;
     label: string;
     placeholder: string;
+    rows: number;
   };
 
 const TextArea: React.FC<Props> = ({
@@ -24,6 +25,7 @@ const TextArea: React.FC<Props> = ({
   label,
   placeholder,
   type,
+  rows,
   ...formControlProps
 }) => {
   const [field, { error }] = useField(name);
@@ -31,7 +33,13 @@ const TextArea: React.FC<Props> = ({
   return (
     <FormControl {...formControlProps} isInvalid={!!error}>
       <FormLabel htmlFor={name}>{label}</FormLabel>
-      <Textarea {...field} type={type} id={name} placeholder={placeholder} />
+      <Textarea
+        {...field}
+        type={type}
+        id={name}
+        placeholder={placeholder}
+        rows={rows}
+      />
       {!!error && <FormErrorMessage>{error}</FormErrorMessage>}
     </FormControl>
   );

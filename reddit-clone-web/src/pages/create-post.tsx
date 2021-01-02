@@ -15,6 +15,24 @@ import TextArea from '../components/TextArea';
 import { Formik, Form } from 'formik';
 import { Button } from '@chakra-ui/react';
 
+// Utils
+import * as Yup from 'yup';
+
+enum FIELDS {
+  TITLE = 'title',
+  TEXT = 'text',
+}
+
+const validationSchema = Yup.object().shape({
+  [FIELDS.TITLE]: Yup.string()
+    .min(5, `Minimum 5 characters`)
+    .max(100, `Maximum 100 characters`)
+    .required('This field is required'),
+  [FIELDS.TEXT]: Yup.string()
+    .min(50, `Minimum 50 characters`)
+    .required('This field is required'),
+});
+
 const CreatePost: React.FC = () => {
   useIsLoggedIn();
   const [createPost] = useCreatePostMutation({
@@ -27,7 +45,8 @@ const CreatePost: React.FC = () => {
   return (
     <Layout>
       <Formik
-        initialValues={{ title: '', text: '' }}
+        initialValues={{ [FIELDS.TITLE]: '', [FIELDS.TEXT]: '' }}
+        validationSchema={validationSchema}
         onSubmit={async (values) => {
           try {
             const response = await createPost({ variables: values });
@@ -44,16 +63,17 @@ const CreatePost: React.FC = () => {
         {({ isSubmitting }) => (
           <Form>
             <InputField
-              name="title"
+              name={FIELDS.TITLE}
               label="Title"
               placeholder="Title"
               marginBottom="10px"
             />
             <TextArea
-              name="text"
+              name={FIELDS.TEXT}
               label="Body"
               placeholder="Anything in your mind ?"
               marginBottom="20px"
+              rows={15}
             />
             <Button type="submit" isLoading={isSubmitting}>
               Create Post

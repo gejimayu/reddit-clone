@@ -12,6 +12,19 @@ import { Formik, Form } from 'formik';
 import { Button, Link, Flex } from '@chakra-ui/react';
 import NextLink from 'next/link';
 
+// Utils
+import * as Yup from 'yup';
+
+enum FIELDS {
+  USERNAME_OR_EMAIL = 'usernameOrEmail',
+  PASSWORD = 'password',
+}
+
+const validationSchema = Yup.object().shape({
+  [FIELDS.USERNAME_OR_EMAIL]: Yup.string().required('This field is required'),
+  [FIELDS.PASSWORD]: Yup.string().required('This field is required'),
+});
+
 const Login: React.FC = () => {
   const [login, { client }] = useLoginMutation();
   const router = useRouter();
@@ -19,15 +32,19 @@ const Login: React.FC = () => {
   return (
     <Container variant="small">
       <Formik
-        initialValues={{ usernameOrEmail: '', password: '' }}
+        initialValues={{
+          [FIELDS.USERNAME_OR_EMAIL]: '',
+          [FIELDS.PASSWORD]: '',
+        }}
+        validationSchema={validationSchema}
         onSubmit={async (values, { setErrors }) => {
           const response = await login({ variables: values });
           const error = response.data?.login?.error;
           if (error) {
-            if (error.fieldName === 'usernameOrEmail') {
-              setErrors({ usernameOrEmail: error.message });
-            } else if (error.fieldName === 'password') {
-              setErrors({ password: error.message });
+            if (error.fieldName === FIELDS.USERNAME_OR_EMAIL) {
+              setErrors({ [FIELDS.USERNAME_OR_EMAIL]: error.message });
+            } else if (error.fieldName === FIELDS.PASSWORD) {
+              setErrors({ [FIELDS.PASSWORD]: error.message });
             }
           } else {
             client.resetStore();
@@ -42,13 +59,13 @@ const Login: React.FC = () => {
         {({ isSubmitting }) => (
           <Form>
             <InputField
-              name="usernameOrEmail"
+              name={FIELDS.USERNAME_OR_EMAIL}
               label="Username or Email"
               placeholder="Username or Email"
               marginBottom="10px"
             />
             <InputField
-              name="password"
+              name={FIELDS.PASSWORD}
               label="Password"
               type="password"
               placeholder="Password"

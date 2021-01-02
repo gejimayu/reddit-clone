@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import withApollo from '../hocs/withApollo';
 
 // Components
-import Container from '../components/Container';
+import FormContainer from '../components/FormContainer';
 import InputField from '../components/InputField';
 import { Formik, Form } from 'formik';
 import { Button } from '@chakra-ui/react';
@@ -40,7 +40,7 @@ const Register: React.FC = () => {
   const router = useRouter();
 
   return (
-    <Container variant="small">
+    <FormContainer>
       <Formik
         initialValues={{
           [FIELDS.USERNAME]: '',
@@ -91,7 +91,7 @@ const Register: React.FC = () => {
           </Form>
         )}
       </Formik>
-    </Container>
+    </FormContainer>
   );
 };
 

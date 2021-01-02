@@ -2,7 +2,7 @@
 import { Box } from '@chakra-ui/react';
 
 const VARIANT = {
-  small: '400px',
+  small: '500px',
   large: '1000px',
 };
 

@@ -7,7 +7,7 @@ import { useForgetPasswordMutation } from '../generated/graphql';
 import withApollo from '../hocs/withApollo';
 
 // Components
-import Container from '../components/Container';
+import FormContainer from '../components/FormContainer';
 import InputField from '../components/InputField';
 import SuccessPrompt from '../components/SuccessPrompt';
 import { Formik, Form } from 'formik';
@@ -31,7 +31,7 @@ const ForgetPassword: React.FC = () => {
   const [forgetPassword] = useForgetPasswordMutation();
 
   return (
-    <Container variant="small">
+    <FormContainer>
       {!isComplete ? (
         <Formik
           initialValues={{ [FIELDS.EMAIL]: '' }}
@@ -61,7 +61,7 @@ const ForgetPassword: React.FC = () => {
           content="A verification email has been sent. Please check to proceed further"
         />
       )}
-    </Container>
+    </FormContainer>
   );
 };
 

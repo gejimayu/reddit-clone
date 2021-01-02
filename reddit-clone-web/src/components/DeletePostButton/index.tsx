@@ -6,10 +6,10 @@ import { IconButton } from '@chakra-ui/react';
 import { DeleteIcon } from '@chakra-ui/icons';
 
 // Types
-import { PostSnippetFragment } from '../../generated/graphql';
+import { Post } from '../../generated/graphql';
 
 type Props = {
-  post: PostSnippetFragment;
+  post: Pick<Post, 'id' | '__typename'>;
 };
 
 const DeletePostButtons: React.FC<Props> = ({ post }) => {

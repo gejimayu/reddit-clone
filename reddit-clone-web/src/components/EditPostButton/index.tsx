@@ -6,11 +6,11 @@ import { IconButton } from '@chakra-ui/react';
 import { EditIcon } from '@chakra-ui/icons';
 
 // Types
-import { PostSnippetFragment } from '../../generated/graphql';
+import { Post } from '../../generated/graphql';
 import { SpaceProps } from '@chakra-ui/react';
 
 type Props = SpaceProps & {
-  post: PostSnippetFragment;
+  post: Pick<Post, 'id'>;
 };
 
 const EditPostButtons: React.FC<Props> = ({ post, ...styles }) => {

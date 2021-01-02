@@ -16,7 +16,7 @@ import Layout from '../../../components/Layout';
 import InputField from '../../../components/InputField';
 import TextArea from '../../../components/TextArea';
 import { Formik, Form } from 'formik';
-import { Button } from '@chakra-ui/react';
+import { Button, Skeleton, SkeletonText } from '@chakra-ui/react';
 
 // Utils
 import * as Yup from 'yup';
@@ -41,15 +41,11 @@ const EditPost: React.FC = () => {
   const router = useRouter();
   const postId = router.query.postId as string;
 
-  const { data, loading } = usePostQuery({ variables: { postId } });
+  const { data } = usePostQuery({ variables: { postId } });
   const [updatePost] = useUpdatePostMutation();
 
-  if (loading) {
-    return <p>Loading...</p>;
-  }
-
   if (!data?.post) {
-    return <p>could not find post</p>;
+    return <p>Could not find post</p>;
   }
 
   return (

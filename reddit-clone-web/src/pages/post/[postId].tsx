@@ -9,7 +9,7 @@ import { useRouter } from 'next/router';
 import Layout from '../../components/Layout';
 import DeletePostButtons from '../../components/DeletePostButton';
 import EditPostButtons from '../../components/EditPostButton';
-import { Heading, Text, Flex } from '@chakra-ui/react';
+import { Heading, Text, Flex, Skeleton, SkeletonText } from '@chakra-ui/react';
 
 const Post: React.FC = () => {
   const router = useRouter();
@@ -20,16 +20,14 @@ const Post: React.FC = () => {
     },
   });
 
-  if (loading) {
-    return <p>Loading ....</p>;
-  }
-
-  if (error) {
-    return <p>Error</p>;
-  }
-
-  if (!data?.post) {
-    return <p>Post not found</p>;
+  if (loading || error || !data?.post) {
+    return (
+      <Layout>
+        <Skeleton height="43px" />
+        <SkeletonText marginTop="32px" noOfLines={10} spacing="16px" />
+        <SkeletonText marginTop="32px" noOfLines={10} spacing="16px" />
+      </Layout>
+    );
   }
 
   const post = data.post;

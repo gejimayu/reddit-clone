@@ -51,7 +51,8 @@ const CreatePost: React.FC = () => {
           try {
             const response = await createPost({ variables: values });
             if (!response.errors) {
-              router.push('/');
+              const postId = response.data?.createPost?.post?.id;
+              router.push(`/post/${postId}`);
             }
           } catch (err) {
             if (err.message.startsWith('NotAuthenticated')) {

@@ -28,10 +28,11 @@ const TextArea: React.FC<Props> = ({
   rows,
   ...formControlProps
 }) => {
-  const [field, { error }] = useField(name);
+  const [field, { error, touched }] = useField(name);
 
+  const showError = touched && !!error;
   return (
-    <FormControl {...formControlProps} isInvalid={!!error}>
+    <FormControl {...formControlProps} isInvalid={showError}>
       <FormLabel htmlFor={name}>{label}</FormLabel>
       <Textarea
         {...field}
@@ -40,7 +41,7 @@ const TextArea: React.FC<Props> = ({
         placeholder={placeholder}
         rows={rows}
       />
-      {!!error && <FormErrorMessage>{error}</FormErrorMessage>}
+      {showError && <FormErrorMessage>{error}</FormErrorMessage>}
     </FormControl>
   );
 };

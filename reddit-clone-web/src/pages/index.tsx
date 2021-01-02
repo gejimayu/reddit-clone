@@ -7,19 +7,9 @@ import withApollo from '../hocs/withApollo';
 // Components
 import Layout from '../components/Layout';
 import CreateNewPostButton from '../components/CreateNewPostButton';
-import UpvoteSection from '../components/UpvoteSection';
-import DeletePostButtons from '../components/DeletePostButton';
-import EditPostButtons from '../components/EditPostButton';
-import {
-  Stack,
-  Box,
-  Heading,
-  Text,
-  Button,
-  Flex,
-  Link,
-} from '@chakra-ui/react';
-import NextLink from 'next/link';
+import PostCard from '../components/PostCard';
+import PostCardSkeleton from '../components/PostCard/skeleton';
+import { Stack, Box, Button, Flex } from '@chakra-ui/react';
 
 const PAGINATION_LIMIT = 10;
 
@@ -36,43 +26,29 @@ const Index: React.FC = () => {
   return (
     <>
       <Layout>
-        {!data && loading ? (
-          <p>Loading ...</p>
-        ) : posts ? (
-          posts.map(
-            (post) =>
-              post && (
-                <Stack marginY="30px" key={post.id}>
-                  <Box padding={5} shadow="md" borderWidth="1px">
-                    <Flex>
-                      <UpvoteSection post={post} />
-                      <Box marginLeft="15px" width="100%">
-                        <NextLink href="post/[postId]" as={`/post/${post.id}`}>
-                          <Link>
-                            <Heading fontSize="xl">{post.title}</Heading>
-                          </Link>
-                        </NextLink>
-                        <Text>Posted by {post.creator.username}</Text>
-                        <Flex
-                          alignItems="center"
-                          justifyContent="space-between"
-                          marginTop="16px"
-                        >
-                          <Text>{post.textSnippet}...</Text>
-                          {post.creatorId === userId && (
-                            <Flex>
-                              <EditPostButtons post={post} marginRight="15px" />
-                              <DeletePostButtons post={post} />
-                            </Flex>
-                          )}
-                        </Flex>
-                      </Box>
-                    </Flex>
-                  </Box>
-                </Stack>
-              )
-          )
-        ) : null}
+        {loading
+          ? [1, 2, 3, 4, 5].map((i) => (
+              <Stack marginY="30px" key={i}>
+                <Box padding={5} shadow="md" borderWidth="1px">
+                  <PostCardSkeleton />
+                </Box>
+              </Stack>
+            ))
+          : posts
+          ? posts.map(
+              (post) =>
+                post && (
+                  <Stack marginY="30px" key={post.id}>
+                    <Box padding={5} shadow="md" borderWidth="1px">
+                      <PostCard
+                        post={post}
+                        showEditDeleteButton={post.creatorId === userId}
+                      />
+                    </Box>
+                  </Stack>
+                )
+            )
+          : null}
         {posts.length > 0 && hasMore && (
           <Flex>
             <Button

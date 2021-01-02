@@ -16,8 +16,7 @@ import Layout from '../../../components/Layout';
 import InputField from '../../../components/InputField';
 import TextArea from '../../../components/TextArea';
 import { Formik, Form } from 'formik';
-import { Button, IconButton } from '@chakra-ui/react';
-import { CloseIcon } from '@chakra-ui/icons';
+import { Button } from '@chakra-ui/react';
 
 // Utils
 import * as Yup from 'yup';

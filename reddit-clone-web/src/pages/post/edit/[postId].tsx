@@ -16,7 +16,8 @@ import Layout from '../../../components/Layout';
 import InputField from '../../../components/InputField';
 import TextArea from '../../../components/TextArea';
 import { Formik, Form } from 'formik';
-import { Button } from '@chakra-ui/react';
+import { Button, IconButton } from '@chakra-ui/react';
+import { CloseIcon } from '@chakra-ui/icons';
 
 // Utils
 import * as Yup from 'yup';
@@ -85,7 +86,17 @@ const EditPost: React.FC = () => {
               rows={15}
             />
             <Button type="submit" isLoading={isSubmitting}>
-              Create Post
+              Edit Post
+            </Button>
+            <Button
+              colorScheme="red"
+              marginLeft="10px"
+              isLoading={isSubmitting}
+              onClick={() => {
+                router.back();
+              }}
+            >
+              Cancel
             </Button>
           </Form>
         )}

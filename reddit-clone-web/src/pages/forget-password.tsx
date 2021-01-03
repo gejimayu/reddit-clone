@@ -51,7 +51,7 @@ const ForgetPassword: React.FC = () => {
                 marginBottom="20px"
               />
               <Button type="submit" isLoading={isSubmitting}>
-                Login
+                Submit
               </Button>
             </Form>
           )}
